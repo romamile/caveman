@@ -1,3 +1,3 @@
 
-Base Template, nothing happens here beside the drawing recognition.
-Best place to start your own project!
+Animaper
+Little test of animation system with the PTX system.
