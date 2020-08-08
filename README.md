@@ -1,2 +1,3 @@
-# animaper
-Exploration of an animation system using PTX technology (augmented paper)
+
+Base Template, nothing happens here beside the drawing recognition.
+Best place to start your own project!
