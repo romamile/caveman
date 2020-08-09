@@ -46,16 +46,6 @@ class areaCore {
       
  }
 
- void drawRez() {
-   
-    s.setFill(color(c.r*255, c.g*255, c.b*255, 255) );
-    myPtxInter.mFbo.pushMatrix();
-    myPtxInter.mFbo.translate(center.x + wFbo/2, center.y, 0);
-    myPtxInter.mFbo.shape(s);
-    myPtxInter.mFbo.popMatrix();
-      
- }
-
   public void createPShape() {
     c = new ptx_color();
     c.fromHSV(myArea.hue, 1, 1);

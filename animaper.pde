@@ -9,7 +9,7 @@ char scanKey = 'a';
 int wFbo, hFbo, hZone, wZone, hCell, wCell;
 float rMig, rZone;
 
-ArrayList<areaCore> listArea;
+cell myCell;
 ribbon myRibbon;
 int maxNbrCells = 12;
   
@@ -24,11 +24,11 @@ void setup() {
   // ===== =============== =====
 
 
-  fullScreen(P3D, 2);
-  //size(1300, 900, P3D);
+  //fullScreen(P3D, 2);
+  size(1300, 900, P3D);
   noCursor();
 
-  listArea = new ArrayList<areaCore>();
+  myCell = new cell();
 
   myRibbon = new ribbon();
   
@@ -48,7 +48,10 @@ void setup() {
 }
 
 void draw() {
-    
+  // modification to be able to save the pictures
+  myPtxInter.myPtx.verboseImg = true;
+  
+  
   // ===== 3) SCANNING & CONFIG DRAW LIBRARY =====  
   if (isScanning) {
     background(0);
@@ -106,54 +109,12 @@ void draw() {
 
   myPtxInter.mFbo.background(0);
   
-  for(areaCore refAreaCore : listArea) {
-    refAreaCore.draw();
-  }
+  myCell.draw();
 
-  if(myRibbon.playing)
-    myRibbon.play();
-    
+  myRibbon.update();  
   myRibbon.draw();
   
   // UI
-  myPtxInter.mFbo.fill(255);
-  myPtxInter.mFbo.stroke(255);
-
-
-  myPtxInter.mFbo.stroke(255);
-  myPtxInter.mFbo.strokeWeight(2);
-  myPtxInter.mFbo.beginShape(LINES);
-
-  //Bords
-  myPtxInter.mFbo.vertex(0, hFbo-1); 
-  myPtxInter.mFbo.vertex(wFbo-1, hFbo-1);
-
-  myPtxInter.mFbo.vertex(0, 0);
-  myPtxInter.mFbo.vertex(wFbo-1, 0);
-
-  myPtxInter.mFbo.vertex(0, 0);
-  myPtxInter.mFbo.vertex(0, hFbo-1);
-
-  myPtxInter.mFbo.vertex(wFbo-1, 0);
-  myPtxInter.mFbo.vertex(wFbo-1, hFbo-1);
-
-  // Separations
-  myPtxInter.mFbo.vertex(wFbo/2, hFbo*rMig);
-  myPtxInter.mFbo.vertex(wFbo/2, hFbo-1);
-
-  myPtxInter.mFbo.vertex(0, hFbo*rMig);
-  myPtxInter.mFbo.vertex(wFbo, hFbo*rMig);
-  
-  // list of cells
-  for(int i = 0; i<maxNbrCells; ++i) {
-    
-  myPtxInter.mFbo.vertex(i * wCell, hFbo*rMig);
-  myPtxInter.mFbo.vertex(i * wCell, 0);
-  }
-
-  myPtxInter.mFbo.endShape();
-
-
   myRibbon.drawUI();
 
 
@@ -172,24 +133,12 @@ void atScan() {
   
   // Check if zones are inside the draw area
   
-  listArea.clear();
-  
-  boolean okToAdd = false;
-  
-  for (area itArea : myPtxInter.myPtx.listArea) {
-    okToAdd = true;
-    
-    for(vec2i itDot : itArea.listContour.get(0)) {
-      if( itDot.x > wFbo/2 || itDot.y < hFbo * rMig) {
-        okToAdd = false;
-        break;
-      }
-    }
-    
-    if(okToAdd)
-      listArea.add( new areaCore( itArea ) );
-  }
-  
+  myCell.clear();
+  myCell.img = myPtxInter.myCam.mImgRez.get();
+  for (area itArea : myPtxInter.myPtx.listArea)
+      myCell.listAreaCore.add( new areaCore( itArea ) );
+  myRibbon.addCell( myCell );
+
 }
 
 
@@ -223,26 +172,65 @@ void keyPressed() {
 
 
   switch(key) {
+  case 'q':
+    myRibbon.moving = true;
+    break;
+  case 's':
+    myRibbon.speed = true;
+    break;
+    
+    
   case ' ':
-    myRibbon.addCell(listArea);
+    myRibbon.addCell( myCell );
     break;
   case 'd':
     myRibbon.delCurrentCell();
     break;
+  case 'f':
+    myRibbon.clear();
+    break;
+  case 'h':
+    myRibbon.exportPNG("test");
+    break;
   case 'v':
-    myRibbon.indexUp();
+    if(myRibbon.speed)
+      myRibbon.timeUp();
+    else if(myRibbon.moving)
+      myRibbon.moveUp();
+    else
+      myRibbon.indexUp();
     break;
   case 'c':
-    myRibbon.indexDown();
+    if(myRibbon.speed)
+      myRibbon.timeDown();
+    else if(myRibbon.moving)
+      myRibbon.moveDown();
+    else
+      myRibbon.indexDown();
     break;
   case 'b':
-    myRibbon.index = -1;
+    if(myRibbon.index == -1 && myRibbon.prevIndex != -1) {
+      if(myRibbon.prevIndex < myRibbon.listCell.size()) {  
+        myRibbon.index = myRibbon.prevIndex;
+        myRibbon.prevIndex = -1;
+      } else {
+        if(myRibbon.listCell.size() > 0) { 
+          myRibbon.index = 0;
+          myRibbon.prevIndex = -1;
+        }
+      }
+    }
+    
+    if(myRibbon.index != -1) {
+      myRibbon.prevIndex = myRibbon.index;
+      myRibbon.index = -1;
+    }
     break;
   case 'n':
-    myRibbon.playing = !myRibbon.playing;
     if(myRibbon.playing)
-      if(myRibbon.listCell.size() > 0)
-        myRibbon.index = 0;
+      myRibbon.stop();
+    else
+      myRibbon.play();
     break;
   
     
@@ -257,6 +245,16 @@ void keyReleased() {
     return;
   }
   // ===== ======================= =====
+  
+  switch(key) {
+  case 'q':
+    myRibbon.moving = false;
+    break;
+  case 's':
+    myRibbon.speed = false;
+    break;
+
+  }
 }
 
 
