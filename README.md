@@ -1,7 +1,9 @@
 
-# Animaper
+# Animaper - Work in progress!
 
-Little test of animation system with the PTX system, divided in 3 zone : Bottom left - the drawing zone, bottom right - the display zone, top - the cell zone, with all the saved drawings. 
+Animation software, based on the PTX tech.
+Draw on paper, scan it with PTX, and give life to your drawings!
+Export to png & GIF.
 
 ### Instalation
 Download and unzip the [gifAnimation.zip](https://github.com/extrapixel/gif-animation/archive/3.0.zip) and copy the gifAnimation-folder into your processing libraries folder.
