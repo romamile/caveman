@@ -9,21 +9,39 @@ class ribbon {
   toggle tick;
   boolean loop = true, playing = false, moving = false, speed = false;
  
+  GifMaker gifExport;
   
   ArrayList< cell > listCell;
  
-  ribbon() {
+  ribbon(PApplet _parent) {
     tms = 300;
     tick = new toggle();
     tick.setSpanMs(floor(tms));
     tick.reset(false);
     
     listCell = new ArrayList< cell >();
+    
   }
   
   void exportPNG(String _baseName) {
     for(int i = 0; i<listCell.size(); ++i)
       listCell.get(i).img.save(_baseName + i + ".png");
+  }
+  
+  void exportGIF(String _baseName, PApplet _parent) {
+    
+    gifExport = new GifMaker(_parent, _baseName + ".gif");
+    gifExport.setRepeat(0);        // make it an "endless" animation
+    gifExport.setTransparent(0,0,0);
+    
+    
+    for(cell ref : listCell) {
+      gifExport.setDelay(floor(tms));
+      gifExport.addFrame(ref.img);
+    }
+  
+    gifExport.finish();  
+
   }
   
   void clear() {

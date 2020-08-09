@@ -1,3 +1,5 @@
+import gifAnimation.*;
+
 
 // ===== 1) ROOT LIBRARY =====
 boolean isScanning, isInConfig;
@@ -24,13 +26,13 @@ void setup() {
   // ===== =============== =====
 
 
-  //fullScreen(P3D, 2);
-  size(1300, 900, P3D);
+  fullScreen(P3D, 2);
+  //size(1300, 900, P3D);
   noCursor();
 
   myCell = new cell();
-
-  myRibbon = new ribbon();
+  myRibbon = new ribbon(this);
+    
   
   // Geometry of the UI
   wFbo = myPtxInter.wFrameFbo;
@@ -190,6 +192,8 @@ void keyPressed() {
   case 'f':
     myRibbon.clear();
     break;
+  case 'g':
+    myRibbon.exportGIF("test", this);
   case 'h':
     myRibbon.exportPNG("test");
     break;
