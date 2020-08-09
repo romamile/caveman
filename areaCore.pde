@@ -34,7 +34,17 @@ class areaCore {
     myPtxInter.mFbo.popMatrix();
       
  }
-
+ 
+ void drawIn(PGraphics _here) {
+   
+    _here.beginDraw();
+    _here.translate(center.x, center.y);
+    s.setFill(color(c.r*255, c.g*255, c.b*255, 255) );
+    _here.shape(s);
+    _here.endDraw();
+    
+      
+ }
   void drawMig(int i) {
    
     s.setFill(color(c.r*255, c.g*255, c.b*255, 255) );

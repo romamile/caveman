@@ -48,10 +48,7 @@ void setup() {
 }
 
 void draw() {
-  // modification to be able to save the pictures
-  myPtxInter.myPtx.verboseImg = true;
-  
-  
+
   // ===== 3) SCANNING & CONFIG DRAW LIBRARY =====  
   if (isScanning) {
     background(0);
@@ -130,13 +127,17 @@ void draw() {
 // Use it to update what is meant to be done once you have "new areas"
 
 void atScan() {
-  
-  // Check if zones are inside the draw area
-  
+
   myCell.clear();
-  myCell.img = myPtxInter.myCam.mImgRez.get();
+  
+  // 1) add the areaCore
   for (area itArea : myPtxInter.myPtx.listArea)
       myCell.listAreaCore.add( new areaCore( itArea ) );
+
+  // 2) create and add the transparent PGraphic
+  for (areaCore itAreaCore : myCell.listAreaCore)
+    itAreaCore.drawIn(myCell.img);
+    
   myRibbon.addCell( myCell );
 
 }

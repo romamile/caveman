@@ -1,20 +1,29 @@
 class cell {
   
   ArrayList<areaCore> listAreaCore;
-  PImage img;
+  PGraphics img;
   
   cell() {
      listAreaCore = new ArrayList<areaCore>();
-     img = new PImage();
+     img = createGraphics(wFbo, hFbo);
   }
   
-  cell(ArrayList<areaCore> _listAreaCore, PImage _img) {
-     listAreaCore = new ArrayList<areaCore>();
-     img = _img.get();
+  cell(ArrayList<areaCore> _listAreaCore, PGraphics _img) {
+    listAreaCore = new ArrayList<areaCore>();
+    for(areaCore itAreaCore : _listAreaCore)
+      listAreaCore.add( new areaCore(itAreaCore) );  
+
+    img = createGraphics(wFbo, hFbo);
+    img.beginDraw();
+    img.image(_img, 0, 0);
+    img.endDraw();
   }
   
   cell(cell _cell) {
-    img = _cell.img.get();
+    img = createGraphics(wFbo, hFbo);
+    img.beginDraw();
+    img.image(_cell.img, 0, 0);
+    img.endDraw();
     listAreaCore = new ArrayList<areaCore>();
     for(areaCore itAreaCore : _cell.listAreaCore)
       listAreaCore.add( new areaCore(itAreaCore) );  
@@ -23,7 +32,7 @@ class cell {
  
  void clear() {
      listAreaCore.clear();
-     img = new PImage();
+     img = createGraphics(wFbo, hFbo);
  }
  
   void draw() { 
