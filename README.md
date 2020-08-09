@@ -4,7 +4,7 @@
 Little test of animation system with the PTX system, divided in 3 zone : Bottom left - the drawing zone, bottom right - the display zone, top - the cell zone, with all the saved drawings. 
 
 ### Instalation
-Download and unzip the (https://github.com/extrapixel/gif-animation/archive/3.0.zip)[gifAnimation.zip] and copy the gifAnimation-folder into your processing libraries folder.
+Download and unzip the [gifAnimation.zip](https://github.com/extrapixel/gif-animation/archive/3.0.zip) and copy the gifAnimation-folder into your processing libraries folder.
 
 ### Keys
 *   **Space** - Add the scanned drawing to the list of cells (top)
