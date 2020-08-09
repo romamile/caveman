@@ -26,3 +26,5 @@ Download and unzip the [gifAnimation.zip](https://github.com/extrapixel/gif-anim
 *   **h** - export all in png image
 
 
+### Work document
+https://docs.google.com/document/d/1eotBnLg3JltyS9TRf_H4yIsQVLbm-35GidThbOOsaPk/edit
