@@ -20,6 +20,7 @@ Download and unzip the [gifAnimation.zip](https://github.com/extrapixel/gif-anim
 
 *   **d** - delete the cell selected by the stylus
 *   **f** - delete all cells
+*   **g** - export as a GIF
 *   **h** - export all in png image
 
 
