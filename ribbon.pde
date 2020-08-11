@@ -1,3 +1,5 @@
+import processing.svg.*;
+import gifAnimation.*;
 
 
 class ribbon {
@@ -5,6 +7,7 @@ class ribbon {
   int index = -1;
   int prevIndex = -1;
   float tms;
+  int sampling;
   
   toggle tick;
   boolean loop = true, playing = false, moving = false, speed = false;
@@ -15,6 +18,7 @@ class ribbon {
  
   ribbon(PApplet _parent) {
     tms = 300;
+    sampling = 3;
     tick = new toggle();
     tick.setSpanMs(floor(tms));
     tick.reset(false);
@@ -41,6 +45,61 @@ class ribbon {
     }
   
     gifExport.finish();  
+
+  }
+  
+  void exportSVG(String _baseName) {
+    
+    int ref = 0;
+    PGraphics svg = createGraphics(wZone, hZone, SVG, _baseName+".svg");
+    svg.beginDraw();
+    svg.stroke(0);
+    
+    for(cell refC : listCell)
+    for(areaCore refA : refC.listAreaCore) {
+      
+      if(refA.myArea.listContour.size() == 0)
+        return;
+        
+      svg.fill(refA.c.r, refA.c.g, refA.c.b);
+          
+           
+      svg.beginShape();
+
+      // 1) Exterior part of shape, clockwise winding
+      for (vec2i itPos : refA.myArea.listContour.get(0)) {
+        ref++;
+        if(ref%sampling==0)
+          svg.vertex(itPos.x, itPos.y);
+      }
+    
+        // 2) Interior part of shape, counter-clockwise winding
+        for (int i = 1; i < refA.myArea.listContour.size(); ++i) {
+          svg.beginContour();
+          
+          //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
+          //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
+          //}
+          for (vec2i itPos : refA.myArea.listContour.get(i)) {
+            ref++;
+            if(ref%sampling==0)
+              svg.vertex(itPos.x, itPos.y);
+          }
+          svg.endContour();
+        }
+    
+      svg.endShape(); 
+      
+      
+    
+    }
+    
+    
+    
+        
+
+    svg.dispose();
+    svg.endDraw();
 
   }
   
@@ -179,6 +238,9 @@ class ribbon {
   
     myPtxInter.mFbo.vertex(0, hFbo*rMig);
     myPtxInter.mFbo.vertex(wFbo, hFbo*rMig);
+    
+    myPtxInter.mFbo.vertex(wFbo/2, 0);
+    myPtxInter.mFbo.vertex(wFbo/2, hFbo);
     
     // list of cells
     for(int i = 0; i<maxNbrCells; ++i) {

@@ -1,5 +1,3 @@
-import gifAnimation.*;
-
 
 // ===== 1) ROOT LIBRARY =====
 boolean isScanning, isInConfig;
@@ -41,7 +39,7 @@ void setup() {
   rMig = 0.15;
   
   hZone = int((1-rMig) * hFbo);
-  wZone = wFbo / 2;
+  wZone = wFbo/2;
   rZone = wZone * (1.0 / hZone);
   
   hCell = int(rMig * hFbo);
@@ -108,7 +106,8 @@ void draw() {
 
   myPtxInter.mFbo.background(0);
   
-  myCell.draw();
+  if(!myRibbon.playing)
+    myCell.draw();
 
   myRibbon.update();  
   myRibbon.draw();
@@ -194,6 +193,7 @@ void keyPressed() {
     break;
   case 'g':
     myRibbon.exportGIF("test", this);
+    break;
   case 'h':
     myRibbon.exportPNG("test");
     break;
