@@ -9,7 +9,6 @@ Export to png & GIF.
 Download and unzip the [gifAnimation.zip](https://github.com/extrapixel/gif-animation/archive/3.0.zip) and copy the gifAnimation-folder into your processing libraries folder.
 
 ### Keys
-*   **Space** - Add the scanned drawing to the list of cells (top)
 
 *   **q** - modifier, **c/v** now move the selected frame around
 *   **s** - modifier, **c/v** now slow/quicken the animation
@@ -22,8 +21,10 @@ Download and unzip the [gifAnimation.zip](https://github.com/extrapixel/gif-anim
 
 *   **d** - delete the cell selected by the stylus
 *   **f** - delete all cells
-*   **g** - export as a GIF
-*   **h** - export all in png image
+
+*   **i** - export as GIF file
+*   **o** - export all frames as PNG files
+*   **p** - export all frames as SVG files
 
 
 ### Work document
