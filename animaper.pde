@@ -49,6 +49,11 @@ void setup() {
 
 void draw() {
 
+  // TEST to select a specific ROI
+  
+  myPtxInter.myPtx.specROItl = new vec2i(0, int(rMig * hFbo));
+  myPtxInter.myPtx.specROIbr = new vec2i(wFbo/2, hFbo);
+  
   // ===== 3) SCANNING & CONFIG DRAW LIBRARY =====  
   if (isScanning) {
     background(0);
@@ -98,6 +103,12 @@ void draw() {
   // Your drawing start here
 
 
+  // A] UPDATE
+
+  myRibbon.update();  
+
+  // B] DRAW
+  
   // Keep this part of the code to reset drawing
   background(0);
   myPtxInter.mFbo.beginDraw();
@@ -105,16 +116,9 @@ void draw() {
   // Draw here with "myPtxInter.mFbo" before call to classic drawing functions 
 
   myPtxInter.mFbo.background(0);
-  
-  if(!myRibbon.playing)
-    myCell.draw();
-
-  myRibbon.update();  
-  myRibbon.draw();
-  
-  // UI
+  myRibbon.draw(0.25);
+  myRibbon.drawRez();
   myRibbon.drawUI();
-
 
   // Keep this part of the code to reset drawing
   myPtxInter.mFbo.endDraw();
@@ -181,21 +185,25 @@ void keyPressed() {
     myRibbon.speed = true;
     break;
     
-    
+/*    
   case ' ':
     myRibbon.addCell( myCell );
     break;
+*/
   case 'd':
     myRibbon.delCurrentCell();
     break;
   case 'f':
     myRibbon.clear();
     break;
-  case 'g':
+  case 'i':
     myRibbon.exportGIF("test", this);
     break;
-  case 'h':
+  case 'o':
     myRibbon.exportPNG("test");
+    break;
+  case 'p':
+    myRibbon.exportSVG("test");
     break;
   case 'v':
     if(myRibbon.speed)

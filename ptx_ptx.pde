@@ -1,4 +1,4 @@
-/* //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
+/* //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>// //<>//
  *  This file is part of the PTX library.
  *
  *  The PTX library is free software: you can redistribute it and/or modify
@@ -67,6 +67,8 @@ public class ptx {
   public int tooSmallContourThreshold;
 
   public boolean verboseImg;
+  
+  public vec2i specROItl, specROIbr;
 
   // TEMP
   public float seuil_ratioSurfacePerimetre;
@@ -109,13 +111,17 @@ public class ptx {
 
     seuilSaturation = 0.32;
     seuilValue = 255;
+    
+    specROItl = new vec2i(0,0);
+    specROIbr = new vec2i(9999, 9999);
+
 
     // TEMP
     seuil_ratioSurfacePerimetre = 1.3;
     seuil_tailleSurface = 400;
     seuil_smallArea = 200;
   }
- //<>// //<>// //<>// //<>// //<>// //<>//
+ //<>// //<>// //<>// //<>//
   
   /** 
    * Main function that calls other sub function in order to
@@ -287,6 +293,8 @@ public class ptx {
         && ( !hasBackHue || !backHue.contains( floor(360*cT.getH()) ))
         // == Mask Disk
         //        && (i%_w-_w*0.5)*(i%_w-_w*0.5) + (i/_w-_h*0.5)*(i/_w-_h*0.5) < rMask*rMask 
+        // == SpecROI
+        && specROItl.x < i%ww && i%ww < specROIbr.x && specROItl.y < i/ww && i/ww < specROIbr.y
         ) {
 
         hue = int(360 * cT.getH());

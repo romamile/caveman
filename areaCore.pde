@@ -7,7 +7,7 @@ class areaCore {
   int sampling;
   
   areaCore(area _area) {
-    sampling = 3;
+    sampling = 4;
     myArea = new area(_area);
     center = myArea.center;
     createPShape();
@@ -30,6 +30,16 @@ class areaCore {
  void draw() {
    
     s.setFill(color(c.r*255, c.g*255, c.b*255, 255) );
+    myPtxInter.mFbo.pushMatrix();
+    myPtxInter.mFbo.translate(center.x, center.y, 0);
+    myPtxInter.mFbo.shape(s);
+    myPtxInter.mFbo.popMatrix();
+      
+ }
+ 
+ void draw(float _k) {
+   
+    s.setFill(color(c.r*255, c.g*255, c.b*255, floor(255*_k)) );
     myPtxInter.mFbo.pushMatrix();
     myPtxInter.mFbo.translate(center.x, center.y, 0);
     myPtxInter.mFbo.shape(s);

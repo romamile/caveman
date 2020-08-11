@@ -6,11 +6,13 @@ class ribbon {
   
   int index = -1;
   int prevIndex = -1;
+  int indexRez = -1;
+  
   float tms;
   int sampling;
   
   toggle tick;
-  boolean loop = true, playing = false, moving = false, speed = false;
+  boolean loop = true, playing = true, moving = false, speed = false;
  
   GifMaker gifExport;
   
@@ -18,7 +20,7 @@ class ribbon {
  
   ribbon(PApplet _parent) {
     tms = 300;
-    sampling = 3;
+    sampling = 7;
     tick = new toggle();
     tick.setSpanMs(floor(tms));
     tick.reset(false);
@@ -29,12 +31,12 @@ class ribbon {
   
   void exportPNG(String _baseName) {
     for(int i = 0; i<listCell.size(); ++i)
-      listCell.get(i).img.save(_baseName + i + ".png");
+      listCell.get(i).img.save("./rez/" + _baseName + i + ".png");
   }
   
   void exportGIF(String _baseName, PApplet _parent) {
     
-    gifExport = new GifMaker(_parent, _baseName + ".gif");
+    gifExport = new GifMaker(_parent, "./rez/" + _baseName + ".gif");
     gifExport.setRepeat(0);        // make it an "endless" animation
     gifExport.setTransparent(0,0,0);
     
@@ -50,56 +52,55 @@ class ribbon {
   
   void exportSVG(String _baseName) {
     
-    int ref = 0;
-    PGraphics svg = createGraphics(wZone, hZone, SVG, _baseName+".svg");
-    svg.beginDraw();
-    svg.stroke(0);
-    
-    for(cell refC : listCell)
-    for(areaCore refA : refC.listAreaCore) {
-      
-      if(refA.myArea.listContour.size() == 0)
-        return;
+    for(int ii = 0; ii<listCell.size(); ++ii) {
         
-      svg.fill(refA.c.r, refA.c.g, refA.c.b);
+      int ref = 0;
+      PGraphics svg = createGraphics(wZone, hZone, SVG, "./rez/" + _baseName + ii + ".svg");
+      svg.beginDraw();
+      svg.stroke(0);
+      
+      for(areaCore refA : listCell.get(ii).listAreaCore) {
+        
+        if(refA.myArea.listContour.size() == 0)
+          return;
           
-           
-      svg.beginShape();
-
-      // 1) Exterior part of shape, clockwise winding
-      for (vec2i itPos : refA.myArea.listContour.get(0)) {
-        ref++;
-        if(ref%sampling==0)
-          svg.vertex(itPos.x, itPos.y);
-      }
-    
-        // 2) Interior part of shape, counter-clockwise winding
-        for (int i = 1; i < refA.myArea.listContour.size(); ++i) {
-          svg.beginContour();
-          
-          //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
-          //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
-          //}
-          for (vec2i itPos : refA.myArea.listContour.get(i)) {
-            ref++;
-            if(ref%sampling==0)
-              svg.vertex(itPos.x, itPos.y);
-          }
-          svg.endContour();
+        svg.fill(refA.c.r, refA.c.g, refA.c.b);
+            
+             
+        svg.beginShape();
+  
+        // 1) Exterior part of shape, clockwise winding
+        for (vec2i itPos : refA.myArea.listContour.get(0)) {
+          ref++;
+          if(ref%sampling==0)
+            svg.vertex(itPos.x, itPos.y);
         }
-    
-      svg.endShape(); 
       
+          // 2) Interior part of shape, counter-clockwise winding
+          for (int i = 1; i < refA.myArea.listContour.size(); ++i) {
+            svg.beginContour();
+            
+            //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
+            //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
+            //}
+            for (vec2i itPos : refA.myArea.listContour.get(i)) {
+              ref++;
+              if(ref%sampling==0)
+                svg.vertex(itPos.x, itPos.y);
+            }
+            svg.endContour();
+          }
       
-    
-    }
-    
-    
-    
+        svg.endShape(); 
         
-
-    svg.dispose();
-    svg.endDraw();
+        
+      
+      }
+      
+  
+      svg.dispose();
+      svg.endDraw();
+    }
 
   }
   
@@ -109,8 +110,9 @@ class ribbon {
     listCell.clear();
   }
  
-  void addCell( cell _cell ) {
-    listCell.add( new cell(_cell) );
+  void addCell( cell _cell) {
+    index++;
+    listCell.add( index, new cell(_cell) );
   }
   
   void delCurrentCell() {
@@ -184,52 +186,65 @@ class ribbon {
  
   void play() {
     playing = true;
-    if(index != -1)  
-      if(tick.getState()) {
-        tick.reset(false);
-        indexUp();
-      }
   }
    
   void stop() {
     playing = false;
-    if(prevIndex < listCell.size()) {
+/*
+if(prevIndex < listCell.size()) {
       index = prevIndex;
     } else {
       index = -1;
       prevIndex = -1;
     }
-  }
+*/  }
   
   void update() {
     
-    if(index != -1 && playing && listCell.size() > 1)  
+    if(indexRez == -1  && listCell.size() > 0) {
+      indexRez = 0; 
+    }
+    
+    if(indexRez != -1 && playing && listCell.size() > 1)  
       if(tick.getState()) {
         tick.reset(false);        
          // move up
-      index = (index + 1) % (listCell.size());
+      indexRez = (indexRez + 1) % (listCell.size());
       }
   }
-  
-  void draw() {
+
+  void draw(float _k) {
     
     if(index > listCell.size())
       index = -1;
-   
-    // All list cells
+
+    if(index != -1)
+      for(areaCore itAreaCore : listCell.get(index).listAreaCore )
+        itAreaCore.draw(_k);
+  }
+  
+  void drawRez() {
+        
+    if(indexRez > listCell.size())
+      indexRez = -1;
+
+    myPtxInter.mFbo.pushMatrix();
+    myPtxInter.mFbo.translate(wFbo/2, 0);
+    if(indexRez != -1)
+      for(areaCore itAreaCore : listCell.get(indexRez).listAreaCore )
+        itAreaCore.draw();
+    myPtxInter.mFbo.popMatrix();
+  }
+  
+  
+  void drawUI() {
+    
+    //Mignatures
     for(int i = 0; i < listCell.size(); ++i) {
       for(areaCore itAreaCore : listCell.get(i).listAreaCore )
         itAreaCore.drawMig(i);
     }
     
-    // Rez
-    if(index != -1)
-      for(areaCore itAreaCore : listCell.get(index).listAreaCore )
-        itAreaCore.draw();
-  }
-  
-  
-  void drawUI() {
     
     myPtxInter.mFbo.fill(255);
     myPtxInter.mFbo.stroke(255);
