@@ -108,6 +108,9 @@ class ribbon {
     tick.setSpanMs(floor(tms));
     tick.reset(false);    
     listCell.clear();
+    index = -1;
+    prevIndex = -1;
+    
   }
  
   void addCell( cell _cell) {
@@ -120,10 +123,12 @@ class ribbon {
   void delCurrentCell() {
     if(index != -1)
       listCell.remove(index);
-      
-      if(index > listCell.size() -1)
-        index = listCell.size() -1;
-  }
+
+    index--;
+    
+    if(index > listCell.size() -1 || index < 0)
+      index = 0;
+}
   
   void timeUp() {
     tms /= 1.1;
@@ -274,9 +279,9 @@ if(prevIndex < listCell.size()) {
     
     // The stylus
     if(index != -1) {
-      myPtxInter.mFbo.stroke(255, 0, 0, 100);
+      myPtxInter.mFbo.strokeWeight(3);
+      myPtxInter.mFbo.stroke(255, 0, 0, 180);
       myPtxInter.mFbo.noFill();
-      myPtxInter.mFbo.strokeWeight(2);
       myPtxInter.mFbo.beginShape();
       
       myPtxInter.mFbo.vertex((index+1) * wCell, hFbo*rMig);
