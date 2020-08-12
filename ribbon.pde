@@ -215,7 +215,7 @@ if(prevIndex < listCell.size()) {
 
   void draw(float _k) {
     
-    if(index > listCell.size())
+    if(index > listCell.size()-1)
       index = -1;
 
     if(index != -1)
@@ -225,7 +225,7 @@ if(prevIndex < listCell.size()) {
   
   void drawRez() {
         
-    if(indexRez > listCell.size())
+    if(indexRez > listCell.size()-1)
       indexRez = -1;
 
     myPtxInter.mFbo.pushMatrix();
