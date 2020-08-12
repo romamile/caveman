@@ -212,6 +212,7 @@ void keyPressed() {
       myRibbon.moveUp();
     else
       myRibbon.indexUp();
+
     break;
   case 'c':
     if(myRibbon.speed)
@@ -220,8 +221,10 @@ void keyPressed() {
       myRibbon.moveDown();
     else
       myRibbon.indexDown();
+
     break;
   case 'b':
+  
     if(myRibbon.index == -1 && myRibbon.prevIndex != -1) {
       if(myRibbon.prevIndex < myRibbon.listCell.size()) {  
         myRibbon.index = myRibbon.prevIndex;
@@ -232,9 +235,8 @@ void keyPressed() {
           myRibbon.prevIndex = -1;
         }
       }
-    }
-    
-    if(myRibbon.index != -1) {
+      
+    } else if(myRibbon.index != -1) {
       myRibbon.prevIndex = myRibbon.index;
       myRibbon.index = -1;
     }

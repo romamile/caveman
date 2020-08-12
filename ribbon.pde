@@ -111,6 +111,8 @@ class ribbon {
   }
  
   void addCell( cell _cell) {
+    
+    prevIndex = index;
     index++;
     listCell.add( index, new cell(_cell) );
   }
