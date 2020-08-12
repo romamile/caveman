@@ -61,7 +61,7 @@ class areaCore {
    
     _here.beginDraw();
     _here.translate(center.x, center.y);
-    s.setFill(color(c.r*255, c.g*255, c.b*255, 255) );
+     s.setFill(color(c.r*255, c.g*255, c.b*255, 255) );
     _here.shape(s);
     _here.endDraw();
     
@@ -94,27 +94,31 @@ class areaCore {
 
     // 1) Exterior part of shape, clockwise winding
     for (vec2i itPos : myArea.listContour.get(0)) {
-      ref++;
-      if(ref%sampling==0)
+  //    ref++;
+  //    if(ref%sampling==0)
         s.vertex(itPos.x - center.x, itPos.y - center.y);
     }
-  
-      // 2) Interior part of shape, counter-clockwise winding
-      for (int i = 1; i < myArea.listContour.size(); ++i) {
-        s.beginContour();
-        
-        //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
-        //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
-        //}
-        for (vec2i itPos : myArea.listContour.get(i)) {
-          ref++;
-          if(ref%sampling==0)
-            s.vertex(itPos.x - center.x, itPos.y - center.y);
-        }
-        s.endContour();
+    s.vertex(myArea.listContour.get(0).get(0).x - center.x, myArea.listContour.get(0).get(0).y - center.y);
+
+    // 2) Interior part of shape, counter-clockwise winding
+    println(myArea.listContour.size());
+    for (int i = 1; i < myArea.listContour.size(); ++i) {
+      s.beginContour();
+      
+      //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
+      //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
+      //}
+      for (vec2i itPos : myArea.listContour.get(i)) {
+//        ref++;
+//        if(ref%sampling==0)
+          s.vertex(itPos.x - center.x, itPos.y - center.y);
       }
-  
-    s.endShape(CLOSE); 
+      s.vertex(myArea.listContour.get(i).get(0).x - center.x, myArea.listContour.get(i).get(0).y - center.y);
+      
+      s.endContour();
+    }
+
+    s.endShape(); 
   }
   
   

@@ -132,6 +132,7 @@ public class area {
     // 1) Exterior part of shape, clockwise winding
     for (vec2i itPos : listContour.get(0))
       s.vertex(itPos.x, itPos.y);
+    s.vertex(listContour.get(0).get(0).x, listContour.get(0).get(0).y);
   
       // 2) Interior part of shape, counter-clockwise winding
       for (int i = 1; i < listContour.size(); ++i) {
@@ -139,9 +140,10 @@ public class area {
         for (vec2i itPos : listContour.get(i))
           s.vertex(itPos.x, itPos.y);
         s.endContour();
+        s.vertex(listContour.get(i).get(0).x, listContour.get(i).get(0).y);
       }
   
-    s.endShape(CLOSE); 
+    s.endShape(); 
   }
   
   public void draw(float _k) {

@@ -24,6 +24,7 @@ class cell {
     img.beginDraw();
     img.image(_cell.img, 0, 0);
     img.endDraw();
+    
     listAreaCore = new ArrayList<areaCore>();
     for(areaCore itAreaCore : _cell.listAreaCore)
       listAreaCore.add( new areaCore(itAreaCore) );  

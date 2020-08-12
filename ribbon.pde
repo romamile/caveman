@@ -218,9 +218,13 @@ if(prevIndex < listCell.size()) {
     if(index > listCell.size()-1)
       index = -1;
 
-    if(index != -1)
-      for(areaCore itAreaCore : listCell.get(index).listAreaCore )
-        itAreaCore.draw(_k);
+    if(index != -1) {
+    //  for(areaCore itAreaCore : listCell.get(index).listAreaCore )
+    //    itAreaCore.draw(_k);
+
+      myPtxInter.mFbo.image(listCell.get(index).img, 0, 0);
+        
+    }
   }
   
   void drawRez() {
