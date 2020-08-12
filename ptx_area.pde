@@ -141,7 +141,7 @@ public class area {
         s.endContour();
       }
   
-    s.endShape(); 
+    s.endShape(CLOSE); 
   }
   
   public void draw(float _k) {

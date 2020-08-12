@@ -13,9 +13,7 @@ class ribbon {
   
   toggle tick;
   boolean loop = true, playing = true, moving = false, speed = false;
- 
-  GifMaker gifExport;
-  
+   
   ArrayList< cell > listCell;
  
   ribbon(PApplet _parent) {
@@ -36,14 +34,14 @@ class ribbon {
   
   void exportGIF(String _baseName, PApplet _parent) {
     
-    gifExport = new GifMaker(_parent, "./rez/" + _baseName + ".gif");
+    GifMaker gifExport = new GifMaker(_parent, "./rez/" + _baseName + ".gif");
     gifExport.setRepeat(0);        // make it an "endless" animation
     gifExport.setTransparent(0,0,0);
     
     
-    for(cell ref : listCell) {
+    for(cell refCell : listCell) {
       gifExport.setDelay(floor(tms));
-      gifExport.addFrame(ref.img);
+      gifExport.addFrame(refCell.img);
     }
   
     gifExport.finish();  

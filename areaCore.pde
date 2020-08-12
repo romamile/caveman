@@ -114,7 +114,7 @@ class areaCore {
         s.endContour();
       }
   
-    s.endShape(); 
+    s.endShape(CLOSE); 
   }
   
   
