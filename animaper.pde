@@ -28,8 +28,8 @@ void setup() {
   //size(1300, 900, P3D);
   noCursor();
 
+  myRibbon = new ribbon();
   myCell = new cell();
-  myRibbon = new ribbon(this);
     
   
   // Geometry of the UI

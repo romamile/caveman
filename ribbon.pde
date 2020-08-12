@@ -16,7 +16,7 @@ class ribbon {
    
   ArrayList< cell > listCell;
  
-  ribbon(PApplet _parent) {
+  ribbon() {
     tms = 300;
     sampling = 7;
     tick = new toggle();

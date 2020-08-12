@@ -7,7 +7,7 @@ class areaCore {
   int sampling;
   
   areaCore(area _area) {
-    sampling = 4;
+    sampling = myRibbon.sampling;
     myArea = new area(_area);
     center = myArea.center;
     createPShape();
@@ -18,7 +18,7 @@ class areaCore {
 
     myArea = new area(_areaCore.myArea);
     center = _areaCore.center;
-    sampling = _areaCore.sampling;
+    sampling = myRibbon.sampling;
     createPShape();
  }
  
