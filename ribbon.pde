@@ -18,7 +18,7 @@ class ribbon {
  
   ribbon() {
     tms = 300;
-    sampling = 7;
+    sampling = 6;
     tick = new toggle();
     tick.setSpanMs(floor(tms));
     tick.reset(false);
@@ -55,24 +55,25 @@ class ribbon {
       int ref = 0;
       PGraphics svg = createGraphics(wZone, hZone, SVG, "./rez/" + _baseName + ii + ".svg");
       svg.beginDraw();
-      svg.stroke(0);
+      svg.noStroke();
       
       for(areaCore refA : listCell.get(ii).listAreaCore) {
         
         if(refA.myArea.listContour.size() == 0)
           return;
           
-        svg.fill(refA.c.r, refA.c.g, refA.c.b);
+        svg.fill(refA.c.r*255, refA.c.g*255, refA.c.b*255);
             
              
         svg.beginShape();
   
         // 1) Exterior part of shape, clockwise winding
         for (vec2i itPos : refA.myArea.listContour.get(0)) {
-          ref++;
           if(ref%sampling==0)
             svg.vertex(itPos.x, itPos.y);
+          ref++;
         }
+        svg.vertex(refA.myArea.listContour.get(0).get(0).x, refA.myArea.listContour.get(0).get(0).y);
       
           // 2) Interior part of shape, counter-clockwise winding
           for (int i = 1; i < refA.myArea.listContour.size(); ++i) {
@@ -82,10 +83,11 @@ class ribbon {
             //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
             //}
             for (vec2i itPos : refA.myArea.listContour.get(i)) {
-              ref++;
               if(ref%sampling==0)
                 svg.vertex(itPos.x, itPos.y);
+              ref++;
             }
+            svg.vertex(refA.myArea.listContour.get(i).get(0).x, refA.myArea.listContour.get(i).get(0).y);
             svg.endContour();
           }
       

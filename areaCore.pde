@@ -94,24 +94,24 @@ class areaCore {
 
     // 1) Exterior part of shape, clockwise winding
     for (vec2i itPos : myArea.listContour.get(0)) {
-  //    ref++;
-  //    if(ref%sampling==0)
+      if(ref%sampling==0)
         s.vertex(itPos.x - center.x, itPos.y - center.y);
+      ref++;
     }
     s.vertex(myArea.listContour.get(0).get(0).x - center.x, myArea.listContour.get(0).get(0).y - center.y);
 
     // 2) Interior part of shape, counter-clockwise winding
-    println(myArea.listContour.size());
     for (int i = 1; i < myArea.listContour.size(); ++i) {
       s.beginContour();
       
       //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
       //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
       //}
+       ref = 0;
       for (vec2i itPos : myArea.listContour.get(i)) {
-//        ref++;
-//        if(ref%sampling==0)
+        if(ref%sampling==0)
           s.vertex(itPos.x - center.x, itPos.y - center.y);
+        ref++;
       }
       s.vertex(myArea.listContour.get(i).get(0).x - center.x, myArea.listContour.get(i).get(0).y - center.y);
       
