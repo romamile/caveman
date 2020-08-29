@@ -30,7 +30,7 @@
   "greenMin": 75,
   "seuil_tailleSurface": 400,
   "seuil_smallArea": 200,
-  "savePicture": 0,
+  "savePicture": 1,
   "yellowMax": 71,
   "tooSmallThreshold": 40
 }

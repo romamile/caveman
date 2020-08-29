@@ -229,8 +229,9 @@ if(prevIndex < listCell.size()) {
     //  for(areaCore itAreaCore : listCell.get(index).listAreaCore )
     //    itAreaCore.draw(_k);
 
+      myPtxInter.mFbo.tint(255, 64);  // Display at half opacity
       myPtxInter.mFbo.image(listCell.get(index).img, 0, 0);
-        
+      myPtxInter.mFbo.tint(255, 255);    
     }
   }
   
