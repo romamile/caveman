@@ -1,4 +1,8 @@
 
+// lib used
+//import processing.svg.*;
+//import gifAnimation.*;
+
 // ===== 1) ROOT LIBRARY =====
 boolean isScanning, isInConfig;
 ptx_inter myPtxInter;
@@ -11,12 +15,11 @@ float rMig, rZone;
 
 cell myCell;
 ribbon myRibbon;
-int maxNbrCells = 12;
-  
-  
-  
-void setup() {
+int maxNbrCells = 60;
+int scroll = 0, scrollIncrement = 10;
 
+void setup() {
+  
   // ===== 2) INIT LIBRARY =====  
   isScanning = false;
   isInConfig = false;
@@ -78,7 +81,9 @@ void draw() {
         myPtxInter.myCam.update();
         myPtxInter.scanCam();
         
+        println("hello 11111");
         if (myPtxInter.myGlobState != globState.CAMERA) {
+                  println("hello 2222222222222");
           myPtxInter.scanClr();
           atScan();
         }
@@ -205,6 +210,16 @@ void keyPressed() {
   case 'p':
     myRibbon.exportSVG("test");
     break;
+    
+    
+  case 'w':
+    scroll -= scrollIncrement;
+    scroll = max(0, scroll);
+    break;
+  case 'x':
+    scroll += scrollIncrement;
+    break;
+
   case 'v':
     if(myRibbon.speed)
       myRibbon.timeUp();

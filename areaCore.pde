@@ -31,7 +31,7 @@ class areaCore {
    
     s.setFill(color(c.r*255, c.g*255, c.b*255, 255) );
     myPtxInter.mFbo.pushMatrix();
-    myPtxInter.mFbo.translate(center.x, center.y, 0);
+    myPtxInter.mFbo.translate(center.x, center.y);
     myPtxInter.mFbo.shape(s);
     myPtxInter.mFbo.popMatrix();
       
@@ -41,7 +41,7 @@ class areaCore {
    
     s.setFill(color(c.r*255, c.g*255, c.b*255, floor(255*_k)) );
     myPtxInter.mFbo.pushMatrix();
-    myPtxInter.mFbo.translate(center.x, center.y, 0);
+    myPtxInter.mFbo.translate(center.x, center.y);
     myPtxInter.mFbo.shape(s);
     myPtxInter.mFbo.popMatrix();
       
@@ -51,7 +51,7 @@ class areaCore {
    
     s.setFill(color(c.r*255, c.g*255, c.b*255, 255) );
     myPtxInter.mFbo.pushMatrix();
-    myPtxInter.mFbo.translate(center.x + wFbo/2, center.y, 0);
+    myPtxInter.mFbo.translate(center.x + wFbo/2, center.y);
     myPtxInter.mFbo.shape(s);
     myPtxInter.mFbo.popMatrix();
       
@@ -71,7 +71,7 @@ class areaCore {
    
     s.setFill(color(c.r*255, c.g*255, c.b*255, 255) );
     myPtxInter.mFbo.pushMatrix();
-    myPtxInter.mFbo.translate( (i) * wCell + center.x*rMig/rZone, center.y*rMig/rZone, 0);
+    myPtxInter.mFbo.translate( (i) * wCell + center.x*rMig/rZone, center.y*rMig/rZone);
     myPtxInter.mFbo.scale(rMig/rZone);
     myPtxInter.mFbo.shape(s);
     myPtxInter.mFbo.popMatrix();

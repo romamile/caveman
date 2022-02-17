@@ -121,6 +121,7 @@ public class cam {
         println(i + ", " + cameras[i]);
       }
     }
+    
   }
 
   /** 
@@ -151,8 +152,7 @@ public class cam {
 
     // 1) Select the camera 
     String[] cameras = Capture.list();
-    println();
-
+  
     if (cameras.length == 0)
       return;
 
@@ -160,20 +160,29 @@ public class cam {
       println("FOUND GOOD CAM");
       camStr = cameras[_idCam];
       camId = _idCam;
+      
+      // Get the correct video id from the camera
+      ArrayList<String> listCamStr = exeMult("v4l2-ctl --list-device");
+      
+      for (int i = 0; i < listCamStr.size(); ++i) {
+        if(listCamStr.get(i).contains(camStr) && i < listCamStr.size() - 1) {
+          camVideoId = Integer.parseInt( split(listCamStr.get(i+1), "/dev/video")[1] );
+          break;
+        }
+      }
+      
     } else {
       println("DEFAULT CAM");
       camStr = cameras[0];
       camId = 0;
+      camVideoId = 0;
     }
 
     println(_idCam + " / Camera: " + camStr);
 
-    // Check camVideoId for control of hardware camera
-    String[] camStrSplit = split(camStr, ',');
-    camVideoId = Character.getNumericValue( camStrSplit[0].charAt(camStrSplit[0].length()-1) ); 
-
     // 2) Create the capture object
-    cpt = new Capture(_myGrandParent, camStr);
+    //cpt = new Capture(_myGrandParent, cameras[0]);
+    cpt = new Capture(_myGrandParent, 1280, 720, camStr, 30);
 
     // 3) Launch
     cpt.start();
@@ -183,6 +192,7 @@ public class cam {
       print("Waiting for camera with non null values\n");
       update();
     }
+
 
     wCam = cpt.width;
     hCam = cpt.height;
@@ -212,22 +222,26 @@ public class cam {
    * @return          <code>true</code> if the camera is availabe. 
    */
   boolean update() {
-
+    
     if (camVideoId == -1)
       return true;
 
     long locStart  = System.currentTimeMillis();  
     if (cpt.available()) {
       cpt.read();
+      
+      // FOLLOWING TWO LINES ARE HERE TO HELP WITH A BUG IN PROCESSING VIDEO
+      // APPARENTLY OU NEED TO DISPLAY THE VIDEO ON THE SCREEN IN ORDER TO ACCESS ITS PIXEL WHEN USING "P3D" RENDER... GO FIGURE...
+      cpt.loadPixels();
+      image(cpt, width, height, width*0.1, height*0.1);
 
       mImg = cpt.copy();
-
       mImgCroped = createImage(wFbo, hFbo, RGB);
-
       return true;
     }
     return false;
-  }
+
+ }
 
   /** 
    * Copy the main image into filter Image and rez Image objects for displaying
@@ -243,7 +257,8 @@ public class cam {
    * @return          <code>true</code> if the camera is availabe. 
    */
   boolean isOn() {
-    return cpt.available();
+     return false;
+//    return cpt.available();
   }
 
 
@@ -264,14 +279,13 @@ public class cam {
   }
 
   int modCam(String _action, String _param, int _val) {
-    
     if (  System.getProperty ("os.name").contains("Linux") ) {
       String setCmd = "v4l2-ctl -d /dev/video"+camVideoId+" --set-ctrl ";
       String getCmd = "v4l2-ctl -d /dev/video"+camVideoId+" --get-ctrl ";
 
       String paramStr = exe(getCmd+_param);
       if ( paramStr.contains("unknown") ) {
-        println("Camera doesn't have the parametre exposure");
+        println("Camera doesn't have the parametre " + _param);
         return -1;
       }
         
@@ -290,8 +304,7 @@ public class cam {
     }
     
     return -1;
-    
-  }  
+    }  
 
   void switchToManual() {
     if (  System.getProperty ("os.name").contains("Linux") ) {
@@ -305,7 +318,6 @@ public class cam {
   }
 
   String exe(String cmd) {
-
     String returnedValues = "";
     String rezStr = "";
 
@@ -337,7 +349,54 @@ public class cam {
         // if something is returned (ie: not null) print the result
         while ( (returnedValues = stdErr.readLine ()) != null) {
           if (rezStr.equals(""))
-            rezStr=returnedValues;
+            rezStr=returnedValues;            
+          //println("err/ "+returnedValues);
+        }
+      }
+    }
+
+    // if there is an error, let us know
+    catch (Exception e) {
+      println("Error running command!");  
+      println(e);
+    } 
+
+    return rezStr;
+  }
+  
+    ArrayList<String> exeMult(String cmd) {
+    
+    String returnedValues = "";
+    ArrayList<String> rezStr = new ArrayList<String>();
+
+    try {
+      File workingDir = new File("./");  
+      Process p = Runtime.getRuntime().exec(cmd, null, workingDir);
+
+      // variable to check if we've received confirmation of the command
+      int i = p.waitFor();
+
+      // if we have an output, print to screen
+      if (i == 0) {
+
+        // BufferedReader used to get values back from the command
+        BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
+
+        // read the output from the command
+        while ( (returnedValues = stdInput.readLine ()) != null) {
+            rezStr.add(returnedValues);
+          //println("out/ "+ returnedValues);
+        }
+      }
+
+      // if there are any error messages but we can still get an output, they print here
+      else {
+        BufferedReader stdErr = new BufferedReader(new InputStreamReader(p.getErrorStream()));
+
+        // if something is returned (ie: not null) print the result
+        while ( (returnedValues = stdErr.readLine ()) != null) {
+            rezStr.add(returnedValues);
+            
           //println("err/ "+returnedValues);
         }
       }

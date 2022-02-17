@@ -23,7 +23,7 @@ import java.awt.event.KeyEvent;
 
 import deadpixel.keystone.*;
 
-public enum globState { MIRE, CAMERA, RECOG };
+public enum globState { PLAY, MIRE, CAMERA, RECOG };
 public enum recogState { RECOG_FLASH, RECOG_ROI, RECOG_BACK, RECOG_COL, RECOG_AREA, RECOG_CONTOUR };
 public enum cameraState { CAMERA_WHOLE, CAMERA_ROI }; 
 
@@ -621,11 +621,13 @@ public class ptx_inter {
 
       mFbo.endShape();
     } else {
-      mFbo.noStroke();
+      
       mFbo.beginShape(TRIANGLE_FAN);
+      mFbo.stroke(grayLevelUp);
       mFbo.fill(grayLevelUp);
       mFbo.vertex(mFbo.width, 0);
       mFbo.vertex(0, 0);  
+      mFbo.stroke(grayLevelDown);
       mFbo.fill(grayLevelDown);
       mFbo.vertex(0, mFbo.height);
       mFbo.vertex(mFbo.width, mFbo.height);
@@ -848,7 +850,6 @@ public class ptx_inter {
 
     idCam = loadJSONObject(_filePath).getInt("idCam");
     
-    
     myCam.modCam("set", "exposure_absolute", floor(json.getFloat("cam_exposure")) );
     myCam.modCam("set", "saturation", floor(json.getFloat("cam_saturation")) );
     myCam.modCam("set", "brightness", floor(json.getFloat("cam_brightness")) );
@@ -866,6 +867,7 @@ public class ptx_inter {
       ks.stopCalibration();
       myCam.dotIndex = -1;
       noCursor();
+      myGlobState = globState.PLAY;
       break;
     case (KeyEvent.VK_F2-15):
       ks.toggleCalibration();
