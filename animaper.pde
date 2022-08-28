@@ -30,9 +30,6 @@ void setup() {
   fullScreen(P3D, 2);
   //size(1300, 900, P3D);
   noCursor();
-
-  myRibbon = new ribbon();
-  myCell = new cell();
     
   
   // Geometry of the UI
@@ -47,7 +44,11 @@ void setup() {
   
   hCell = int(rMig * hFbo);
   wCell = int(hCell * rZone);
+
   
+  myRibbon = new ribbon(wFbo, hFbo);
+  myCell = new cell();
+
 }
 
 void draw() {
@@ -128,7 +129,7 @@ void draw() {
   // Keep this part of the code to reset drawing
   myPtxInter.mFbo.endDraw();
   myPtxInter.displayFBO();
-
+  
 }
 
 

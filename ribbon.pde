@@ -15,8 +15,10 @@ class ribbon {
   boolean loop = true, playing = true, moving = false, speed = false;
    
   ArrayList< cell > listCell;
- 
-  ribbon() {
+  PGraphics locFbo;
+  int wFbo, hFbo;
+
+  ribbon(int _wFbo, int _hFbo) {
     tms = 300;
     sampling = 6;
     tick = new toggle();
@@ -26,11 +28,79 @@ class ribbon {
     listCell = new ArrayList< cell >();
     title = loadImage("./data/caveman-titre.png");
     
+    wFbo = _wFbo;
+    hFbo = _hFbo;
+    locFbo = createGraphics(wFbo, hFbo);   
+
   }
   
   void exportPNG(String _baseName) {
-    for(int i = 0; i<listCell.size(); ++i)
-      listCell.get(i).img.save("./rez/" + _baseName + i + ".png");
+    
+   
+    for(int j = 0; j<listCell.size(); ++j) {
+      locFbo.beginDraw();
+      locFbo.background(0,0,0,0);
+      for(areaCore itAreaCore : listCell.get(j).listAreaCore ) {
+        
+        //itAreaCore.s.setFill(color(itAreaCore.c.r*255, itAreaCore.c.g*255, itAreaCore.c.b*255) );
+        locFbo.pushMatrix();
+        locFbo.translate(itAreaCore.center.x, itAreaCore.center.y);
+        //locFbo.shape(itAreaCore.s);
+          int ref = 0;
+              
+          if(itAreaCore.myArea.listContour.size() == 0)
+            return;
+
+          ptx_color c = new ptx_color();
+          c.fromHSV(itAreaCore.myArea.hue, 1, 1);
+
+          locFbo.beginShape();
+          locFbo.noStroke();
+          locFbo.fill(c.r*255, c.g*255, c.b*255);
+      
+          // 1) Exterior part of shape, clockwise winding
+          for (vec2i itPos : itAreaCore.myArea.listContour.get(0)) {
+            if(ref%sampling==0)
+              locFbo.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
+            ref++;
+          }
+          locFbo.vertex(itAreaCore.myArea.listContour.get(0).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(0).get(0).y - itAreaCore.center.y);
+      
+          // 2) Interior part of shape, counter-clockwise winding
+          for (int ii = 1; ii < itAreaCore.myArea.listContour.size(); ++ii) {
+            locFbo.beginContour();
+            
+            //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
+            //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
+            //}
+             ref = 0;
+            for (vec2i itPos : itAreaCore.myArea.listContour.get(ii)) {
+              if(ref%sampling==0)
+                locFbo.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
+              ref++;
+            }
+            locFbo.vertex(itAreaCore.myArea.listContour.get(ii).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(ii).get(0).y - itAreaCore.center.y);
+            
+            locFbo.endContour();
+          }
+      
+          locFbo.endShape();
+        
+        
+        locFbo.popMatrix(); 
+  
+      }
+      
+      locFbo.endDraw();
+      locFbo.save("./rez/" + _baseName + j + ".png");
+    }
+    
+    
+    
+    
+    // OLD way using image as an inbetween rendering, had the bug "8" with rendering
+    //for(int i = 0; i<listCell.size(); ++i)
+    //  listCell.get(i).img.save("./rez/" + _baseName + i + ".png");
   }
   
   void exportGIF(String _baseName, PApplet _parent) {
@@ -43,9 +113,65 @@ class ribbon {
     println(exe("rm -rf "+rezPath+"/tmp/*.png"));
     
     // 1) export all png
-   for(int i = 0; i<listCell.size(); ++i)
-      listCell.get(i).img.save("./rez/tmp/" + tmpId + "_" + _baseName + i + ".png");
+    for(int j = 0; j<listCell.size(); ++j) {
+      locFbo.beginDraw();
+      locFbo.background(0,0,0,0);
+      for(areaCore itAreaCore : listCell.get(j).listAreaCore ) {
+        
+        //itAreaCore.s.setFill(color(itAreaCore.c.r*255, itAreaCore.c.g*255, itAreaCore.c.b*255) );
+        locFbo.pushMatrix();
+        locFbo.translate(itAreaCore.center.x, itAreaCore.center.y);
+        //locFbo.shape(itAreaCore.s);
+          int ref = 0;
+              
+          if(itAreaCore.myArea.listContour.size() == 0)
+            return;
+
+          ptx_color c = new ptx_color();
+          c.fromHSV(itAreaCore.myArea.hue, 1, 1);
+
+          locFbo.beginShape();
+          locFbo.noStroke();
+          locFbo.fill(c.r*255, c.g*255, c.b*255);
+      
+          // 1) Exterior part of shape, clockwise winding
+          for (vec2i itPos : itAreaCore.myArea.listContour.get(0)) {
+            if(ref%sampling==0)
+              locFbo.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
+            ref++;
+          }
+          locFbo.vertex(itAreaCore.myArea.listContour.get(0).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(0).get(0).y - itAreaCore.center.y);
+      
+          // 2) Interior part of shape, counter-clockwise winding
+          for (int ii = 1; ii < itAreaCore.myArea.listContour.size(); ++ii) {
+            locFbo.beginContour();
+            
+            //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
+            //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
+            //}
+             ref = 0;
+            for (vec2i itPos : itAreaCore.myArea.listContour.get(ii)) {
+              if(ref%sampling==0)
+                locFbo.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
+              ref++;
+            }
+            locFbo.vertex(itAreaCore.myArea.listContour.get(ii).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(ii).get(0).y - itAreaCore.center.y);
+            
+            locFbo.endContour();
+          }
+      
+          locFbo.endShape();
+        
+        
+        locFbo.popMatrix(); 
+  
+      }
+      
+      locFbo.endDraw();
+      locFbo.save("./rez/tmp/" + tmpId + "_" + _baseName + j + ".png");
     
+    }
+      
     
     // 2) Imagemagik to convert to GIF  
    
@@ -53,7 +179,7 @@ class ribbon {
     
        // 2.1) check for size.... (TODO)
 
-    String mess = exe("convert -size 1080x1080 -delay 34 -loop 0 -dispose 2 "+rezPath+"/tmp/"+tmpId+"*.png "+rezPath+"/output.gif");
+    String mess = exe("convert -size 1080x1080 -delay 34 -loop 0 -dispose 2 "+rezPath+"/tmp/"+tmpId+"*.png "+rezPath+"/" + tmpId + "_output.gif");
     println(mess);
     
     //3) delete the pictures in tmp
@@ -243,7 +369,9 @@ if(prevIndex < listCell.size()) {
     //    itAreaCore.draw(_k);
 
       myPtxInter.mFbo.tint(255, 64);  // Display at half opacity
-      myPtxInter.mFbo.image(listCell.get(index).img, 0, 0);
+//    myPtxInter.mFbo.image(listCell.get(index).img, 0, 0);
+      for(areaCore itAreaCore : listCell.get(index).listAreaCore )
+        itAreaCore.draw();
       myPtxInter.mFbo.tint(255, 255);    
     }
   }
