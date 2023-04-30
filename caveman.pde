@@ -15,7 +15,8 @@ float rMig, rZone;
 
 cell myCell;
 ribbon myRibbon;
-int maxNbrCells = 60;
+int maxNbrCells = 12;
+int maxSizeOnion = 3;
 int scroll = 0, scrollIncrement = 10;
 
 void setup() {
@@ -36,7 +37,8 @@ void setup() {
   wFbo = myPtxInter.wFrameFbo;
   hFbo = myPtxInter.hFrameFbo;
   
-  rMig = 0.15;
+  rMig = 0.14;
+  
   
   hZone = int((1-rMig) * hFbo);
   wZone = wFbo/2;
@@ -190,7 +192,13 @@ void keyPressed() {
   case 's':
     myRibbon.speed = true;
     break;
-    
+  case 'g':
+    myRibbon.onionNbr = (myRibbon.onionNbr)%(maxSizeOnion) +1;
+    break;
+  case 'h':
+    myRibbon.loopType = (myRibbon.loopType+1)%3;
+    break;
+
 /*    
   case ' ':
     myRibbon.addCell( myCell );

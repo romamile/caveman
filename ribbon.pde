@@ -8,6 +8,8 @@ class ribbon {
   int prevIndex = -1;
   int indexRez = -1;
   
+  int onionNbr;
+  
   float tms;
   int sampling;
   
@@ -17,6 +19,8 @@ class ribbon {
   ArrayList< cell > listCell;
   PGraphics locFbo;
   int wFbo, hFbo;
+  
+  int loopType;
 
   ribbon(int _wFbo, int _hFbo) {
     tms = 300;
@@ -30,8 +34,10 @@ class ribbon {
     
     wFbo = _wFbo;
     hFbo = _hFbo;
-    locFbo = createGraphics(wFbo, hFbo);   
+    locFbo = createGraphics(wFbo/2, hFbo);   
 
+    loopType = 1;
+    onionNbr = 1;
   }
   
   void exportPNG(String _baseName) {
@@ -254,6 +260,12 @@ class ribbon {
  
   void addCell( cell _cell) {
     
+    if(listCell.size() >= maxNbrCells) {
+      myPtxInter.strUI = "Can't add more cells!";
+      myPtxInter.togUI.reset(true);     
+      return; 
+    }
+    
     prevIndex = index;
     index++;
     listCell.add( index, new cell(_cell) );
@@ -353,9 +365,17 @@ if(prevIndex < listCell.size()) {
     
     if(indexRez != -1 && playing && listCell.size() > 1)  
       if(tick.getState()) {
-        tick.reset(false);        
-         // move up
-      indexRez = (indexRez + 1) % (listCell.size());
+        tick.reset(false);
+        
+        switch(loopType) {
+        case 0: return;
+        case 1: // move up
+          indexRez = (indexRez + 1) % (listCell.size());
+          break;
+        case 2: // move down
+          indexRez = (indexRez + listCell.size() - 1) % (listCell.size());
+          break;
+        }
       }
   }
 
@@ -368,11 +388,18 @@ if(prevIndex < listCell.size()) {
     //  for(areaCore itAreaCore : listCell.get(index).listAreaCore )
     //    itAreaCore.draw(_k);
 
-      myPtxInter.mFbo.tint(255, 64);  // Display at half opacity
-//    myPtxInter.mFbo.image(listCell.get(index).img, 0, 0);
-      for(areaCore itAreaCore : listCell.get(index).listAreaCore )
-        itAreaCore.draw();
-      myPtxInter.mFbo.tint(255, 255);    
+
+      // RIBBON
+      for(int oIndex = index - onionNbr + 1; oIndex <= index - 1 + onionNbr ; ++oIndex) {
+        if(oIndex > listCell.size()-1 || oIndex < 0)
+          continue;
+          
+        int k = abs(index - oIndex) + 1;
+        for(areaCore itAreaCore : listCell.get(oIndex).listAreaCore )
+          itAreaCore.draw(64.0/(255*k));
+
+      }
+
     }
   }
   
@@ -398,7 +425,8 @@ if(prevIndex < listCell.size()) {
     
     
     if(listCell.size() > 7) {
-      scroll =  wCell * (index-7);
+// No more scrolling for now
+//      scroll =  wCell * (index-7);
     } else {
       scroll = 0; 
     }
@@ -436,33 +464,27 @@ if(prevIndex < listCell.size()) {
       // BOTTOM LINE
     myPtxInter.mFbo.vertex(0 * wCell, hFbo*rMig);
     myPtxInter.mFbo.vertex(listCell.size() * wCell, hFbo*rMig);
-           
-    myPtxInter.mFbo.stroke(28, 44, 255);
+
+    myPtxInter.mFbo.endShape();
 
 
-   // The stylus
+   // The stylus highlight
+    myPtxInter.mFbo.beginShape();
+    myPtxInter.mFbo.noStroke();
+    myPtxInter.mFbo.fill(28, 44, 255, 100);
     myPtxInter.mFbo.vertex((index  ) * wCell, 0);
     myPtxInter.mFbo.vertex((index+1) * wCell, 0);
-    
+    myPtxInter.mFbo.vertex((index+1) * wCell, hFbo*rMig);    
     myPtxInter.mFbo.vertex((index  ) * wCell, hFbo*rMig);
-    myPtxInter.mFbo.vertex((index+1) * wCell, hFbo*rMig);
-    
-    myPtxInter.mFbo.vertex((index  ) * wCell, hFbo*rMig);
-    myPtxInter.mFbo.vertex((index  ) * wCell, 0);
-    
-    myPtxInter.mFbo.strokeWeight(4);
-    myPtxInter.mFbo.vertex((index+1) * wCell, hFbo*rMig);
-    myPtxInter.mFbo.vertex((index+1) * wCell, 0);
-       
     myPtxInter.mFbo.endShape();
 
       // Numbers
     for(int i = 0; i < listCell.size(); ++i) {      
-      if(listCell.size() > 7) {
+//      if(listCell.size() > 7) { // alway number for now
         myPtxInter.mFbo.textSize(15);
         myPtxInter.mFbo.fill(28, 44, 255);
-        myPtxInter.mFbo.text(i, i * wCell + 4, 18);
-      }
+        myPtxInter.mFbo.text(i+1, i * wCell + 4, 18);
+//      }
     }
 
     
