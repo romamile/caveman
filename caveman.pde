@@ -1,13 +1,25 @@
 
-// lib used
 //import processing.svg.*;
 //import gifAnimation.*;
+import beads.*;
 
 // ===== 1) ROOT LIBRARY =====
 boolean isScanning, isInConfig;
 ptx_inter myPtxInter;
 char scanKey = 'a';
 // ===== =============== =====
+
+/* Sounds
+  - set up beads again
+  - remember how to play/stop sounds
+  - List sound:
+      AnnimVierge
+      Delete
+      Export GIF
+      Q/catch drop, or left right
+      Scan
+      SpeedPerc
+*/
 
 
 int wFbo, hFbo, hZone, wZone, hCell, wCell;
@@ -18,6 +30,11 @@ ribbon myRibbon;
 int maxNbrCells = 12;
 int maxSizeOnion = 3;
 int scroll = 0, scrollIncrement = 10;
+int nextFrameExport = 0;
+
+AudioContext ac;
+HashMap<String, SamplePlayer> soundMap;
+
 
 void setup() {
   
@@ -27,7 +44,7 @@ void setup() {
   myPtxInter = new ptx_inter(this);
   // ===== =============== =====
 
-
+  myPtxInter.versionExp = new String[]{"1", "0", "0", "caveman"};
   fullScreen(P3D, 2);
   //size(1300, 900, P3D);
   noCursor();
@@ -50,6 +67,29 @@ void setup() {
   
   myRibbon = new ribbon(wFbo, hFbo);
   myCell = new cell();
+
+
+  // Sound
+  ac = AudioContext.getDefaultContext();
+  Gain g = new Gain(ac, 2, 0.2);
+  ac.out.addInput(g);
+  ac.start();
+
+  soundMap = new HashMap<String, SamplePlayer>();
+
+  //  SamplePlayer player = new SamplePlayer(ac, SampleManager.sample(dataPath("sound/boum.wav")));
+  //  g.addInput(player);
+  //  ac.start();
+
+
+  for (String nameSound : new String[]{"vierge", "delete", "export", "left", "right", "scan", "speed"}) {
+    soundMap.put( nameSound, new SamplePlayer(ac, SampleManager.sample( dataPath("sound/"+nameSound+".wav")) ) );
+    soundMap.get(nameSound).setKillOnEnd(false);
+    soundMap.get(nameSound).setPosition(99999999);
+    g.addInput(soundMap.get(nameSound));
+  }
+  
+  // soundMap.get("boum").start(0);
 
 }
 
@@ -84,14 +124,14 @@ void draw() {
         myPtxInter.myCam.update();
         myPtxInter.scanCam();
         
-        println("hello 11111");
         if (myPtxInter.myGlobState != globState.CAMERA) {
-                  println("hello 2222222222222");
           myPtxInter.scanClr();
           atScan();
         }
 
         myPtxInter.whiteCtp = 0;
+        if(myPtxInter.myGlobState == globState.MIRE)
+	  myPtxInter.ks.startCalibration();
         isScanning = false;
       }
     }
@@ -129,9 +169,26 @@ void draw() {
   myRibbon.drawUI();
 
   // Keep this part of the code to reset drawing
+  myPtxInter.postGameDraw();
   myPtxInter.mFbo.endDraw();
   myPtxInter.displayFBO();
   
+
+
+  // shouldn't have anything here...
+
+  switch(nextFrameExport) {
+    case 1: myRibbon.generateNewOutputId(); myRibbon.exportGIF("test", this); break;
+    case 2: myRibbon.generateNewOutputId(); myRibbon.exportPNG("test"); break;
+    case 3: myRibbon.generateNewOutputId(); myRibbon.exportSVG("test"); break;
+    case 4:
+			myRibbon.generateNewOutputId();
+			myRibbon.exportPNG("test");
+			myRibbon.exportSVG("test");
+			myRibbon.exportGIF("test", this);
+			break;
+  }
+  nextFrameExport = 0;
 }
 
 
@@ -177,6 +234,13 @@ void keyPressed() {
    
   // Master key #2 / 2, that launch the scanning process
   if (key == scanKey && !isScanning) {
+    // SHOULDN'T BE HERE, BUT **** IT
+    if(myRibbon.listCell.size() >= maxNbrCells) {
+      myPtxInter.notify("Can't add more cells!",28, 44, 255);
+      return; 
+    }
+    
+    soundMap.get("scan").start(0);
     myPtxInter.whiteCtp = 0;
     isScanning = true;
     return;
@@ -192,12 +256,6 @@ void keyPressed() {
   case 's':
     myRibbon.speed = true;
     break;
-  case 'g':
-    myRibbon.onionNbr = (myRibbon.onionNbr)%(maxSizeOnion) +1;
-    break;
-  case 'h':
-    myRibbon.loopType = (myRibbon.loopType+1)%3;
-    break;
 
 /*    
   case ' ':
@@ -207,20 +265,32 @@ void keyPressed() {
   case 'd':
     myRibbon.delCurrentCell();
     break;
+/*
   case 'f':
     myRibbon.clear();
     break;
+*/
   case 'i':
-    myRibbon.exportGIF("test", this);
+    myPtxInter.notify("EXPORTING FINISHED!",28, 44, 255);
+    nextFrameExport = 4;
+    break;
+
+/*
+  case 'i':
+    myPtxInter.notify("EXPORT GIF!",28, 44, 255);
+    nextFrameExport = 1;
     break;
   case 'o':
-    myRibbon.exportPNG("test");
+    myPtxInter.notify("EXPORT PNG!",28, 44, 255);
+    nextFrameExport = 2;
     break;
   case 'p':
-    myRibbon.exportSVG("test");
+    myPtxInter.notify("EXPORT SVG!",28, 44, 255);
+    nextFrameExport = 3;
     break;
-    
-    
+*/
+  
+/*    
   case 'w':
     scroll -= scrollIncrement;
     scroll = max(0, scroll);
@@ -228,6 +298,7 @@ void keyPressed() {
   case 'x':
     scroll += scrollIncrement;
     break;
+*/
 
   case 'v':
     if(myRibbon.speed)
@@ -245,10 +316,11 @@ void keyPressed() {
       myRibbon.moveDown();
     else
       myRibbon.indexDown();
-
     break;
+
   case 'b':
-  
+      myRibbon.onionNbr = (myRibbon.onionNbr)%(maxSizeOnion) +1;
+/*
     if(myRibbon.index == -1 && myRibbon.prevIndex != -1) {
       if(myRibbon.prevIndex < myRibbon.listCell.size()) {  
         myRibbon.index = myRibbon.prevIndex;
@@ -264,12 +336,16 @@ void keyPressed() {
       myRibbon.prevIndex = myRibbon.index;
       myRibbon.index = -1;
     }
+    */
     break;
   case 'n':
+      myRibbon.loopType = (myRibbon.loopType+1)%3;
+/*
     if(myRibbon.playing)
       myRibbon.stop();
     else
       myRibbon.play();
+  */  
     break;
   
     
@@ -306,7 +382,7 @@ void mousePressed() {
     // Select one "dot" of ROI if close enough
     myPtxInter.myCam.dotIndex = -1;
     for(int i = 0; i < 4; ++i) {
-      if( (myPtxInter.myCam.ROI[i].subTo( new vec2f(mouseX, mouseY) ).length()) < 50 ) {
+      if( (myPtxInter.myCam.ROI[i].subTo( new vec2f(mouseX/myPtxInter.myCam.zoomCamera , mouseY/myPtxInter.myCam.zoomCamera) ).length()) < 50 ) {
         myPtxInter.myCam.dotIndex = i;
       }
       
@@ -322,7 +398,7 @@ void mouseDragged() {
   
     if (isInConfig && myPtxInter.myGlobState == globState.CAMERA) {
        if (myPtxInter.myCam.dotIndex != -1) {
-         myPtxInter.myCam.ROI[myPtxInter.myCam.dotIndex].addMe( new vec2f(mouseX-pmouseX, mouseY - pmouseY) ); 
+         myPtxInter.myCam.ROI[myPtxInter.myCam.dotIndex].addMe( new vec2f( (mouseX-pmouseX)/myPtxInter.myCam.zoomCamera, (mouseY - pmouseY)/myPtxInter.myCam.zoomCamera) ); 
        }
     }
 
