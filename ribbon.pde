@@ -56,7 +56,6 @@ class ribbon {
     outputId = floor(random(1000000));
     String rezPath = sketchPath() + "/rez";   
     println(exe("mkdir "+rezPath+"/output_"+outputId));
-    
   }
 
   void exportPNG(String _baseName) {
@@ -116,7 +115,11 @@ class ribbon {
       }
       
       locFbo.endDraw();
-      locFbo.save("./rez/output_" + outputId + "/" + _baseName + j + ".png");
+      //locFbo.save("./rez/output_" + outputId + "/" + _baseName + j + ".png");
+      locFbo.save("./rez/output_" + nf(month(), 2) + "-" + nf(day(),2) + "_" + nf(hour(),2) + ":" + nf(minute(), 2)+ ":" + nf(second(),2) + "/" + _baseName + j + ".png");
+
+
+
     }
     
     
@@ -263,7 +266,7 @@ class ribbon {
 
     }
 
-    println( exe("convert -size " + (wFbo/2) + "x" + hFbo + " -delay "+ floor(tms / 10)+"  -loop 0 -dispose 2 "+rezPath+"/tmp/"+tmpId+"*.png "+rezPath+"/output_" + outputId + "/output.gif") );
+    println( exe("convert -size " + (locFbo.width) + "x" + locFbo.height + " -delay "+ floor(tms / 10)+"  -loop 0 -dispose 2 "+rezPath+"/tmp/"+tmpId+"*.png "+rezPath+"/output_" + outputId + "/output.gif") );
     
     //3) delete the pictures in tmp
     println(exe("rm -rf ./caveman/rez/tmp")); 
@@ -544,8 +547,9 @@ if(prevIndex < listCell.size()) {
     myPtxInter.mFbo.translate(-scroll,0);    
 */
 
-    // C] Big UI window   
-    myPtxInter.mFbo.image(UI_BIG, 0, hFbo*rMig, wFbo/2, hFbo*(1-rMig));
+    // C] Big UI window
+    int offsetX = 5, offsetY = -5; 
+    myPtxInter.mFbo.image(UI_BIG, 0 + offsetX, hFbo*rMig + offsetY, wFbo/2, hFbo*(1-rMig));
 
     // B) Mignatures
     for(int i = 0; i < listCell.size(); ++i) {
@@ -557,19 +561,20 @@ if(prevIndex < listCell.size()) {
         // B.2) Vignette autour (depending on state)
       if(i == index) {
         if(moving) {
-          myPtxInter.mFbo.image(UI_mig_selected, i * wCell, 0, wCell, wCell);      
+          myPtxInter.mFbo.image(UI_mig_selected, i * wCell, 0, wCell, hCell);      
         } else {
-          myPtxInter.mFbo.image(UI_mig_hover, i * wCell, 0, wCell, wCell);
+          myPtxInter.mFbo.image(UI_mig_hover, i * wCell, 0, wCell, hCell);
         }
       } else {
-        myPtxInter.mFbo.image(UI_mig_neutral, i * wCell, 0, wCell, wCell);
+        myPtxInter.mFbo.image(UI_mig_neutral, i * wCell, 0, wCell, hCell);
       }
       
         // B.3) Number in the mig
+/*
       myPtxInter.mFbo.textSize(15);
       myPtxInter.mFbo.fill(28, 44, 255);
       myPtxInter.mFbo.text(i+1, i * wCell + 10, 20);
-
+*/
     }
     
 //    myPtxInter.mFbo.translate(scroll,0);

@@ -10,11 +10,11 @@
     "yellowMax": 56
   },
   "seuil": {
-    "seuil_dotVSbig": 400,
-    "seuilLuminance": 200,
-    "seuil_lineVSfill": 1.2999999523162842,
+    "dotVSbig": 400,
+    "luminance": 200,
+    "lineVSfill": 1.2999999523162842,
     "tooSmallContour": 33,
-    "seuilSaturation": 0.25000011920928955,
+    "saturation": 0.25000011920928955,
     "tooSmallSurface": 40
   },
   "trapeze": {
@@ -31,17 +31,17 @@
     "saturation": -999,
     "brightness": -999,
     "exposure": -999,
-    "hCam": 2160,
+    "height": 2160,
     "contrast": -999,
     "temperature": -999,
     "zoom": 0.4101971685886383,
     "id": 0,
-    "wCam": 4096,
-    "withCamera": 0
+    "width": 4096,
+    "enabled": 0
   },
   "flash": {
     "grayLevelDown": 201,
-    "withFlash": 1,
+    "enabled": 1,
     "grayLevelUp": 216,
     "margeScan": 13
   },
