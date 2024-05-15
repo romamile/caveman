@@ -1,21 +1,25 @@
 {
   "histogram": {
-    "yellowMin": 19,
-    "greenMin": 129,
-    "redMax": 318,
-    "blueMin": 213,
-    "redMin": 17,
+    "yellowMin": 28,
+    "greenMin": 99,
+    "redMax": 317,
+    "blueMin": 186,
+    "yellowProto": 35,
+    "greenProto": 120,
+    "redMin": 13,
     "blueMax": 265,
-    "greenMax": 203,
-    "yellowMax": 56
+    "greenMax": 178,
+    "redProto": 0,
+    "blueProto": 240,
+    "yellowMax": 76
   },
   "seuil": {
-    "dotVSbig": 400,
-    "luminance": 200,
-    "lineVSfill": 1.2999999523162842,
-    "tooSmallContour": 33,
-    "saturation": 0.25000011920928955,
-    "tooSmallSurface": 40
+    "saturation": 0.2300001084804535,
+    "luminance": 209,
+    "lineVSfill": 1.399999976158142,
+    "dotVSbig": 401,
+    "tooSmallContour": 34,
+    "tooSmallSurface": 41
   },
   "trapeze": {
     "LowerLeftY": 1884,
@@ -23,7 +27,7 @@
     "LowerLeftX": 1389,
     "LowerRightX": 2826,
     "UpperLeftY": 909.10009765625,
-    "UpperLeftX": 1391.900390625,
+    "UpperLeftX": 1387.900390625,
     "UpperRightY": 944,
     "UpperRightX": 2991
   },
@@ -31,19 +35,19 @@
     "saturation": -999,
     "brightness": -999,
     "exposure": -999,
-    "height": 2160,
     "contrast": -999,
+    "width": 4096,
     "temperature": -999,
     "zoom": 0.4101971685886383,
     "id": 0,
-    "width": 4096,
-    "enabled": 0
+    "enabled": 0,
+    "height": 2160
   },
   "flash": {
-    "grayLevelDown": 201,
-    "enabled": 1,
-    "grayLevelUp": 216,
-    "margeScan": 13
+    "grayLevelDown": 204,
+    "grayLevelUp": 222,
+    "margeScan": 14,
+    "enabled": 1
   },
   "misc": {"withThread": 0}
 }

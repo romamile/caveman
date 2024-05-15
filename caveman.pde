@@ -16,18 +16,6 @@ ptx_inter myPtxInter;
 char scanKey = 'a';
 // ===== =============== =====
 
-/* Sounds
-  - set up beads again
-  - remember how to play/stop sounds
-  - List sound:
-      AnnimVierge
-      Delete
-      Export GIF
-      Q/catch drop, or left right
-      Scan
-      SpeedPerc
-*/
-
 
 int wFbo, hFbo, hZone, wZone, hCell, wCell;
 float rMig, rZone;
@@ -42,6 +30,9 @@ int nextFrameExport = 0;
 AudioContext ac;
 HashMap<String, SamplePlayer> soundMap;
 
+toggle togNotif;
+String strNotif;
+HashMap<String, PImage> notifMap;
 
 void setup() {
   
@@ -84,20 +75,23 @@ void setup() {
 
   soundMap = new HashMap<String, SamplePlayer>();
 
-  //  SamplePlayer player = new SamplePlayer(ac, SampleManager.sample(dataPath("sound/boum.wav")));
-  //  g.addInput(player);
-  //  ac.start();
-
-
-  for (String nameSound : new String[]{"vierge", "delete", "export", "left", "right", "scan", "speed"}) {
+  for (String nameSound : new String[]{"vierge", "delete", "export", "left", "right", "scan", "speed", "changeMode", "grab", "drop", "cantadd"}) {
     soundMap.put( nameSound, new SamplePlayer(ac, SampleManager.sample( dataPath("sound/"+nameSound+".wav")) ) );
     soundMap.get(nameSound).setKillOnEnd(false);
     soundMap.get(nameSound).setPosition(99999999);
     g.addInput(soundMap.get(nameSound));
   }
   
-  // soundMap.get("boum").start(0);
+	// Notifications
 
+	notifMap = new HashMap<String, PImage>();
+	for (String nameImage : new String[]{"loop_0_empty", "loop_1_loop", "loop_2_pingpong", "export", "cantadd"}) {
+			notifMap.put( nameImage, loadImage("./data/"+nameImage+".png") );
+	}
+
+	togNotif = new toggle();
+	togNotif.setSpanS(3);
+	strNotif = "";
 }
 
 void draw() {
@@ -175,6 +169,14 @@ void draw() {
   myRibbon.drawRez();
   myRibbon.drawUI();
 
+
+	// Notifications
+	if(togNotif.getState()) {
+		myPtxInter.mFbo.image(notifMap.get(strNotif), 650, 0);
+	} else {
+		togNotif.stop(false); 
+	} 
+
   // Keep this part of the code to reset drawing
   myPtxInter.postGameDraw();
   myPtxInter.displayTutorial();
@@ -197,7 +199,9 @@ void draw() {
 			myRibbon.exportGIF("test", this);
 			break;
   }
-  nextFrameExport = 0;
+	if(nextFrameExport > 0) {
+		nextFrameExport = Math.max(0, nextFrameExport-10);
+	}
 }
 
 
@@ -245,7 +249,8 @@ void keyPressed() {
   if (key == scanKey && !isScanning) {
     // SHOULDN'T BE HERE, BUT **** IT
     if(myRibbon.listCell.size() >= maxNbrCells) {
-      myPtxInter.notify("Can't add more cells!",28, 44, 255);
+	   	soundMap.get("cantadd").start(0);
+			triggerNotification("cantadd");
       return; 
     }
     
@@ -261,6 +266,7 @@ void keyPressed() {
   switch(key) {
   case 'q':
     myRibbon.moving = true;
+   	soundMap.get("grab").start(0);
     break;
   case 's':
     myRibbon.speed = true;
@@ -280,8 +286,10 @@ void keyPressed() {
     break;
 */
   case 'i':
-    myPtxInter.notify("EXPORTING FINISHED!",28, 44, 255);
-    nextFrameExport = 4;
+    //myPtxInter.notify("EXPORTING FINISHED!",28, 44, 255);
+		triggerNotification("export");
+    soundMap.get("export").start(0);
+    nextFrameExport = 14;
     break;
 
 /*
@@ -349,6 +357,12 @@ void keyPressed() {
     break;
   case 'n':
       myRibbon.loopType = (myRibbon.loopType+1)%3;
+    	soundMap.get("changeMode").start(0);
+			switch(myRibbon.loopType) {
+			case 0:  triggerNotification("loop_0_empty"); break;
+			case 1:  triggerNotification("loop_1_loop"); break;
+			case 2:  triggerNotification("loop_2_pingpong"); break;
+			}
 /*
     if(myRibbon.playing)
       myRibbon.stop();
@@ -375,6 +389,7 @@ void keyReleased() {
   switch(key) {
   case 'q':
     myRibbon.moving = false;
+   	soundMap.get("drop").start(0);
     break;
   case 's':
     myRibbon.speed = false;
@@ -424,4 +439,9 @@ void mouseReleased() {
          myPtxInter.scanCam();
        }
        
+}
+
+void triggerNotification(String _str) {
+	strNotif = _str;
+	togNotif.reset(true);     
 }

@@ -11,6 +11,9 @@ class areaCore {
     myArea = new area(_area);
     center = myArea.center;
     createPShape();
+
+    c = new ptx_color();
+    c.fromHSV(_area.protoHue, 1, 1);
  }
  
  
@@ -20,6 +23,8 @@ class areaCore {
     center = _areaCore.center;
     sampling = myRibbon.sampling;
     createPShape();
+
+    c = _areaCore.c;
  }
  
  void reset() {
@@ -82,8 +87,8 @@ class areaCore {
     
     int ref = 0;
     
-    c = new ptx_color();
-    c.fromHSV(myArea.protoHue, 1, 1);
+    //c = new ptx_color();
+    //c.fromHSV(myArea.protoHue, 1, 1);
         
     s = createShape();
     if(myArea.listContour.size() == 0)

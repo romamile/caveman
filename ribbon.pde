@@ -32,7 +32,7 @@ class ribbon {
 
   ribbon(int _wFbo, int _hFbo) {
     tms = 300;
-    sampling = 6;
+    sampling = 4;
     tick = new toggle();
     tick.setSpanMs(floor(tms));
     tick.reset(false);
@@ -124,8 +124,6 @@ class ribbon {
   }
   
   void exportGIF(String _baseName, PApplet _parent) {
-    
-    soundMap.get("export").start(0);
     
     String rezPath = sketchPath() + "/rez";   
     int idImg = 0;
@@ -519,6 +517,10 @@ if(prevIndex < listCell.size()) {
   }
   
   void drawRez() {
+
+    if(loopType == 0) {
+      return;
+    }
         
     if(indexRez > listCell.size()-1)
       indexRez = -1;
