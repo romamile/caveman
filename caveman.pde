@@ -1,3 +1,10 @@
+// ==== VERSIONING ====  =====
+String nameProject = "Caveman";
+int v1 = 1;
+int v2 = 0;
+int v3 = 5;
+// ==== ===============  =====
+
 
 //import processing.svg.*;
 //import gifAnimation.*;
@@ -42,9 +49,9 @@ void setup() {
   isScanning = false;
   isInConfig = false;
   myPtxInter = new ptx_inter(this);
+  myPtxInter.versionExp = new String[]{""+v1, ""+v2, ""+v3, nameProject};
   // ===== =============== =====
 
-  myPtxInter.versionExp = new String[]{"1", "0", "0", "caveman"};
   fullScreen(P3D, 2);
   //size(1300, 900, P3D);
   noCursor();
@@ -170,6 +177,8 @@ void draw() {
 
   // Keep this part of the code to reset drawing
   myPtxInter.postGameDraw();
+  myPtxInter.displayTutorial();
+  myPtxInter.showNotification();
   myPtxInter.mFbo.endDraw();
   myPtxInter.displayFBO();
   
@@ -178,11 +187,11 @@ void draw() {
   // shouldn't have anything here...
 
   switch(nextFrameExport) {
-    case 1: myRibbon.generateNewOutputId(); myRibbon.exportGIF("test", this); break;
-    case 2: myRibbon.generateNewOutputId(); myRibbon.exportPNG("test"); break;
-    case 3: myRibbon.generateNewOutputId(); myRibbon.exportSVG("test"); break;
+    case 1: myRibbon.generateNewOutputName(); myRibbon.exportGIF("test", this); break;
+    case 2: myRibbon.generateNewOutputName(); myRibbon.exportPNG("test"); break;
+    case 3: myRibbon.generateNewOutputName(); myRibbon.exportSVG("test"); break;
     case 4:
-			myRibbon.generateNewOutputId();
+			myRibbon.generateNewOutputName();
 			myRibbon.exportPNG("test");
 			myRibbon.exportSVG("test");
 			myRibbon.exportGIF("test", this);
@@ -352,10 +361,12 @@ void keyPressed() {
   }
 }
 
+
 void keyReleased() {
 
   // ===== 5) KEY HANDlING LIBRARY ===== 
 
+  myPtxInter.managementKeyReleased();
   if (isScanning || isInConfig) {
     return;
   }

@@ -83,7 +83,7 @@ class areaCore {
     int ref = 0;
     
     c = new ptx_color();
-    c.fromHSV(myArea.hue, 1, 1);
+    c.fromHSV(myArea.protoHue, 1, 1);
         
     s = createShape();
     if(myArea.listContour.size() == 0)

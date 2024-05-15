@@ -21,13 +21,14 @@ class ribbon {
   boolean loop = true, playing = true, moving = false, speed = false;
    
   ArrayList< cell > listCell;
-  PGraphics locFbo;
+  PGraphics locFbo, locFboGIF;
   int wFbo, hFbo;
   
   int loopType;
   boolean pingpong;
 
-  int outputId = 0;
+  String outputName = "";
+
 
   ribbon(int _wFbo, int _hFbo) {
     tms = 300;
@@ -45,18 +46,19 @@ class ribbon {
     
     wFbo = _wFbo;
     hFbo = _hFbo;
-    locFbo = createGraphics(wFbo/2, hFbo);   
+    locFbo = createGraphics(wFbo, hFbo);   
+    locFboGIF = createGraphics(wFbo/2 -16, floor(hFbo*(1-rMig)) - 16 );
 
     loopType = 1;
     pingpong = false;
     onionNbr = 1;
   }
-  
-  void generateNewOutputId() {
-    outputId = floor(random(1000000));
-    String rezPath = sketchPath() + "/rez";   
-    println(exe("mkdir "+rezPath+"/output_"+outputId));
+
+  void generateNewOutputName() {
+    outputName = "output_" + nf(month(), 2) + "-" + nf(day(),2) + "_" + nf(hour(),2) + ":" + nf(minute(), 2)+ ":" + nf(second(),2);
+
   }
+
 
   void exportPNG(String _baseName) {
     
@@ -115,19 +117,10 @@ class ribbon {
       }
       
       locFbo.endDraw();
-      //locFbo.save("./rez/output_" + outputId + "/" + _baseName + j + ".png");
-      locFbo.save("./rez/output_" + nf(month(), 2) + "-" + nf(day(),2) + "_" + nf(hour(),2) + ":" + nf(minute(), 2)+ ":" + nf(second(),2) + "/" + _baseName + j + ".png");
-
-
+      locFbo.save("./rez/" + outputName + "/" + _baseName + j + ".png");
 
     }
     
-    
-    
-    
-    // OLD way using image as an inbetween rendering, had the bug "8" with rendering
-    //for(int i = 0; i<listCell.size(); ++i)
-    //  listCell.get(i).img.save("./rez/" + _baseName + i + ".png");
   }
   
   void exportGIF(String _baseName, PApplet _parent) {
@@ -140,16 +133,24 @@ class ribbon {
 
     println(exe("rm -rf ./caveman/rez/tmp"));
     println(exe("mkdir  ./caveman/rez/tmp"));
+
+    //int offsetX = 5, offsetY = -5; 
+    int offsetX = 15, offsetY = 1; 
+
     // 1) export all png
     for(int j = 0; j<listCell.size(); ++j) {
       idImg++;
-      locFbo.beginDraw();
-      locFbo.background(0,0,0,0);
+      locFboGIF.beginDraw();
+      locFboGIF.background(0,0,0,0);
       for(areaCore itAreaCore : listCell.get(j).listAreaCore ) {
         
         //itAreaCore.s.setFill(color(itAreaCore.c.r*255, itAreaCore.c.g*255, itAreaCore.c.b*255) );
-        locFbo.pushMatrix();
-        locFbo.translate(itAreaCore.center.x, itAreaCore.center.y);
+        locFboGIF.pushMatrix();
+        locFboGIF.translate(itAreaCore.center.x, itAreaCore.center.y);
+
+        // offset
+        locFboGIF.translate(-offsetX, -hFbo*rMig - offsetY);
+
         //locFbo.shape(itAreaCore.s);
           int ref = 0;
               
@@ -159,21 +160,21 @@ class ribbon {
           ptx_color c = new ptx_color();
           c.fromHSV(itAreaCore.myArea.hue, 1, 1);
 
-          locFbo.beginShape();
-          locFbo.noStroke();
-          locFbo.fill(c.r*255, c.g*255, c.b*255);
+          locFboGIF.beginShape();
+          locFboGIF.noStroke();
+          locFboGIF.fill(c.r*255, c.g*255, c.b*255);
       
           // 1) Exterior part of shape, clockwise winding
           for (vec2i itPos : itAreaCore.myArea.listContour.get(0)) {
             if(ref%sampling==0)
-              locFbo.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
+              locFboGIF.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
             ref++;
           }
-          locFbo.vertex(itAreaCore.myArea.listContour.get(0).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(0).get(0).y - itAreaCore.center.y);
+          locFboGIF.vertex(itAreaCore.myArea.listContour.get(0).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(0).get(0).y - itAreaCore.center.y);
       
           // 2) Interior part of shape, counter-clockwise winding
           for (int ii = 1; ii < itAreaCore.myArea.listContour.size(); ++ii) {
-            locFbo.beginContour();
+            locFboGIF.beginContour();
             
             //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
             //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
@@ -181,23 +182,23 @@ class ribbon {
              ref = 0;
             for (vec2i itPos : itAreaCore.myArea.listContour.get(ii)) {
               if(ref%sampling==0)
-                locFbo.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
+                locFboGIF.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
               ref++;
             }
-            locFbo.vertex(itAreaCore.myArea.listContour.get(ii).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(ii).get(0).y - itAreaCore.center.y);
+            locFboGIF.vertex(itAreaCore.myArea.listContour.get(ii).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(ii).get(0).y - itAreaCore.center.y);
             
-            locFbo.endContour();
+            locFboGIF.endContour();
           }
       
-          locFbo.endShape();
+          locFboGIF.endShape();
         
         
-        locFbo.popMatrix(); 
+        locFboGIF.popMatrix(); 
   
       }
       
-      locFbo.endDraw();
-      locFbo.save("./rez/tmp/" + tmpId + "_" + _baseName + idImg + ".png");
+      locFboGIF.endDraw();
+      locFboGIF.save("./rez/tmp/" + tmpId + "_" + _baseName + idImg + ".png");
     
     }
 
@@ -206,13 +207,16 @@ class ribbon {
 
       for(int j = listCell.size() - 2; j > 0;  --j) {
         idImg++;
-        locFbo.beginDraw();
-        locFbo.background(0,0,0,0);
+        locFboGIF.beginDraw();
+        locFboGIF.background(0,0,0,0);
         for(areaCore itAreaCore : listCell.get(j).listAreaCore ) {
           
           //itAreaCore.s.setFill(color(itAreaCore.c.r*255, itAreaCore.c.g*255, itAreaCore.c.b*255) );
-          locFbo.pushMatrix();
-          locFbo.translate(itAreaCore.center.x, itAreaCore.center.y);
+          locFboGIF.pushMatrix();
+          locFboGIF.translate(itAreaCore.center.x, itAreaCore.center.y);
+          // offset
+          locFboGIF.translate( -offsetX, -hFbo*rMig - offsetY);
+
           //locFbo.shape(itAreaCore.s);
             int ref = 0;
                 
@@ -222,21 +226,21 @@ class ribbon {
             ptx_color c = new ptx_color();
             c.fromHSV(itAreaCore.myArea.hue, 1, 1);
 
-            locFbo.beginShape();
-            locFbo.noStroke();
-            locFbo.fill(c.r*255, c.g*255, c.b*255);
+            locFboGIF.beginShape();
+            locFboGIF.noStroke();
+            locFboGIF.fill(c.r*255, c.g*255, c.b*255);
         
             // 1) Exterior part of shape, clockwise winding
             for (vec2i itPos : itAreaCore.myArea.listContour.get(0)) {
               if(ref%sampling==0)
-                locFbo.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
+                locFboGIF.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
               ref++;
             }
-            locFbo.vertex(itAreaCore.myArea.listContour.get(0).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(0).get(0).y - itAreaCore.center.y);
+            locFboGIF.vertex(itAreaCore.myArea.listContour.get(0).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(0).get(0).y - itAreaCore.center.y);
         
             // 2) Interior part of shape, counter-clockwise winding
             for (int ii = 1; ii < itAreaCore.myArea.listContour.size(); ++ii) {
-              locFbo.beginContour();
+              locFboGIF.beginContour();
               
               //for (int j = myArea.listContour.get(i).size() -1; j >= 0; --j) {
               //  s.vertex(myArea.listContour.get(i).get(j).x, myArea.listContour.get(i).get(j).y);
@@ -244,29 +248,30 @@ class ribbon {
                ref = 0;
               for (vec2i itPos : itAreaCore.myArea.listContour.get(ii)) {
                 if(ref%sampling==0)
-                  locFbo.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
+                  locFboGIF.vertex(itPos.x - itAreaCore.center.x, itPos.y - itAreaCore.center.y);
                 ref++;
               }
-              locFbo.vertex(itAreaCore.myArea.listContour.get(ii).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(ii).get(0).y - itAreaCore.center.y);
+              locFboGIF.vertex(itAreaCore.myArea.listContour.get(ii).get(0).x - itAreaCore.center.x, itAreaCore.myArea.listContour.get(ii).get(0).y - itAreaCore.center.y);
               
-              locFbo.endContour();
+              locFboGIF.endContour();
             }
         
-            locFbo.endShape();
+            locFboGIF.endShape();
           
           
-          locFbo.popMatrix(); 
+          locFboGIF.popMatrix(); 
     
         }
         
-        locFbo.endDraw();
-        locFbo.save("./rez/tmp/" + tmpId + "_" + _baseName + idImg + ".png");
+        locFboGIF.endDraw();
+        locFboGIF.save("./rez/tmp/" + tmpId + "_" + _baseName + idImg + ".png");
       
       }
 
     }
 
-    println( exe("convert -size " + (locFbo.width) + "x" + locFbo.height + " -delay "+ floor(tms / 10)+"  -loop 0 -dispose 2 "+rezPath+"/tmp/"+tmpId+"*.png "+rezPath+"/output_" + outputId + "/output.gif") );
+    println( exe("convert -size " + (locFboGIF.width) + "x" + locFboGIF.height + " -delay "+ floor(tms / 10)+"  -loop 0 -dispose 2 "+rezPath+"/tmp/"+tmpId+"*.png "+rezPath+ "/" + outputName + "/output.gif") );
+
     
     //3) delete the pictures in tmp
     println(exe("rm -rf ./caveman/rez/tmp")); 
@@ -278,7 +283,7 @@ class ribbon {
     for(int ii = 0; ii<listCell.size(); ++ii) {
         
       int ref = 0;
-      PGraphics svg = createGraphics(wZone, hZone, SVG, "./rez/output_" + outputId + "/" + _baseName + ii + ".svg");
+      PGraphics svg = createGraphics(wFbo, hFbo, SVG, "./rez/" + outputName + "/" + _baseName + ii + ".svg");
       svg.beginDraw();
       svg.noStroke();
       
@@ -318,11 +323,8 @@ class ribbon {
       
         svg.endShape(); 
         
-        
-      
       }
       
-  
       svg.dispose();
       svg.endDraw();
     }
@@ -548,15 +550,20 @@ if(prevIndex < listCell.size()) {
 */
 
     // C] Big UI window
-    int offsetX = 5, offsetY = -5; 
+    int offsetX = 5, offsetY = -0; 
     myPtxInter.mFbo.image(UI_BIG, 0 + offsetX, hFbo*rMig + offsetY, wFbo/2, hFbo*(1-rMig));
 
     // B) Mignatures
+    myPtxInter.mFbo.translate(5, 0);
     for(int i = 0; i < listCell.size(); ++i) {
-      for(areaCore itAreaCore : listCell.get(i).listAreaCore )
+      for(areaCore itAreaCore : listCell.get(i).listAreaCore ) {
         // B.1) Picture of the drawing
+        myPtxInter.mFbo.push();
+        if(i == index && moving)
+          myPtxInter.mFbo.translate(5, -10);
         itAreaCore.drawMig(i);
-    
+        myPtxInter.mFbo.pop();
+      }
     
         // B.2) Vignette autour (depending on state)
       if(i == index) {
