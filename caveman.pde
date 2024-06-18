@@ -2,7 +2,7 @@
 String nameProject = "Caveman";
 int v1 = 1;
 int v2 = 0;
-int v3 = 5;
+int v3 = 13;
 // ==== ===============  =====
 
 
@@ -11,9 +11,7 @@ int v3 = 5;
 import beads.*;
 
 // ===== 1) ROOT LIBRARY =====
-boolean isScanning, isInConfig;
 ptx_inter myPtxInter;
-char scanKey = 'a';
 // ===== =============== =====
 
 
@@ -37,9 +35,8 @@ HashMap<String, PImage> notifMap;
 void setup() {
   
   // ===== 2) INIT LIBRARY =====  
-  isScanning = false;
-  isInConfig = false;
   myPtxInter = new ptx_inter(this);
+	myPtxInter.scanKey = 'a';
   myPtxInter.versionExp = new String[]{""+v1, ""+v2, ""+v3, nameProject};
   // ===== =============== =====
 
@@ -101,50 +98,11 @@ void draw() {
   myPtxInter.myPtx.specROItl = new vec2i(0, int(rMig * hFbo));
   myPtxInter.myPtx.specROIbr = new vec2i(wFbo/2, hFbo);
   
-  // ===== 3) SCANNING & CONFIG DRAW LIBRARY =====  
-  if (isScanning) {
-    background(0);
-    myPtxInter.generalRender(); 
+  // ===== 3.1) PRE DRAW LIBRARY =====  
+	boolean ptxInterRez = myPtxInter.preDraw(); 
 
-    if(!myPtxInter.withFlash) {
-      myPtxInter.myCam.update();
-      myPtxInter.scanCam();
-      if (myPtxInter.myGlobState != globState.CAMERA) {
-        myPtxInter.scanClr();
-        atScan();
-      }
-      myPtxInter.whiteCtp = 0;
-      isScanning = false;
-    
-    } else { // WITH FLASH
-
-      if (myPtxInter.whiteCtp > 15 && myPtxInter.whiteCtp < 30)
-        myPtxInter.myCam.update();
-
-      if (myPtxInter.whiteCtp > 35) {
-        myPtxInter.myCam.update();
-        myPtxInter.scanCam();
-        
-        if (myPtxInter.myGlobState != globState.CAMERA) {
-          myPtxInter.scanClr();
-          atScan();
-        }
-
-        myPtxInter.whiteCtp = 0;
-        if(myPtxInter.myGlobState == globState.MIRE)
-	  myPtxInter.ks.startCalibration();
-        isScanning = false;
-      }
-    }
-    
-    return;
-  }
-
-  if (isInConfig) {
-    background(0);
-    myPtxInter.generalRender();
-    return;
-  }
+	if(!ptxInterRez)
+		return;
   // ===== ================================= =====  
 
 
@@ -177,13 +135,9 @@ void draw() {
 		togNotif.stop(false); 
 	} 
 
-  // Keep this part of the code to reset drawing
-  myPtxInter.postGameDraw();
-  myPtxInter.displayTutorial();
-  myPtxInter.showNotification();
-  myPtxInter.mFbo.endDraw();
-  myPtxInter.displayFBO();
-  
+  // ===== 3.2) POST DRAW LIBRARY ===== 
+  myPtxInter.postDraw();
+  // ===== ================================= =====    
 
 
   // shouldn't have anything here...
@@ -229,39 +183,9 @@ void atScan() {
 
 void keyPressed() {
 
-
   // ===== 4) KEY HANDlING LIBRARY ===== 
-
-  // Forbid any change it you're in the middle of scanning
-  if (isScanning) {
-    return;
-  }
-
-  myPtxInter.managementKeyPressed();
-
-  if (isInConfig) {
-    myPtxInter.keyPressed();
-    return;
-  }
-
-   
-  // Master key #2 / 2, that launch the scanning process
-  if (key == scanKey && !isScanning) {
-    // SHOULDN'T BE HERE, BUT **** IT
-    if(myRibbon.listCell.size() >= maxNbrCells) {
-	   	soundMap.get("cantadd").start(0);
-			triggerNotification("cantadd");
-      return; 
-    }
-    
-    soundMap.get("scan").start(0);
-    myPtxInter.whiteCtp = 0;
-    isScanning = true;
-    return;
-  }
-
+	myPtxInter.keyPressedRoot();
   // ===== ================================= =====    
-
 
   switch(key) {
   case 'q':
@@ -379,11 +303,7 @@ void keyPressed() {
 void keyReleased() {
 
   // ===== 5) KEY HANDlING LIBRARY ===== 
-
   myPtxInter.managementKeyReleased();
-  if (isScanning || isInConfig) {
-    return;
-  }
   // ===== ======================= =====
   
   switch(key) {
@@ -398,47 +318,25 @@ void keyReleased() {
   }
 }
 
-
 void mousePressed() {
 
   // ===== 6) MOUSE HANDLIND LIBRARY ===== 
-
-  if (isInConfig && myPtxInter.myGlobState == globState.CAMERA  && myPtxInter.myCamState == cameraState.CAMERA_WHOLE && mouseButton == LEFT) {
-
-    // Select one "dot" of ROI if close enough
-    myPtxInter.myCam.dotIndex = -1;
-    for(int i = 0; i < 4; ++i) {
-      if( (myPtxInter.myCam.ROI[i].subTo( new vec2f(mouseX/myPtxInter.myCam.zoomCamera , mouseY/myPtxInter.myCam.zoomCamera) ).length()) < 50 ) {
-        myPtxInter.myCam.dotIndex = i;
-      }
-      
-    }
-  }
-
+	myPtxInter.mousePressed();
   // ===== ========================= =====
 }
 
 void mouseDragged() {
 
   // ===== 7) MOUSE HANDLIND LIBRARY ===== 
-  
-    if (isInConfig && myPtxInter.myGlobState == globState.CAMERA) {
-       if (myPtxInter.myCam.dotIndex != -1) {
-         myPtxInter.myCam.ROI[myPtxInter.myCam.dotIndex].addMe( new vec2f( (mouseX-pmouseX)/myPtxInter.myCam.zoomCamera, (mouseY - pmouseY)/myPtxInter.myCam.zoomCamera) ); 
-       }
-    }
-
+	myPtxInter.mouseDragged();
   // ===== ========================= =====
 }
 
 void mouseReleased() {
   
-  if (isInConfig && myPtxInter.myGlobState == globState.CAMERA  && myPtxInter.myCamState == cameraState.CAMERA_WHOLE)
-       if (myPtxInter.myCam.dotIndex != -1) {
-         myPtxInter.calculateHomographyMatrice(myPtxInter.wFrameFbo, myPtxInter.hFrameFbo, myPtxInter.myCam.ROI);
-         myPtxInter.scanCam();
-       }
-       
+  // ===== 8) MOUSE HANDLIND LIBRARY ===== 
+	myPtxInter.mouseReleased();
+  // ===== ========================= =====
 }
 
 void triggerNotification(String _str) {
