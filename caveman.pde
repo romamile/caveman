@@ -2,7 +2,7 @@
 String nameProject = "Caveman";
 int v1 = 1;
 int v2 = 0;
-int v3 = 13;
+int v3 = 17;
 // ==== ===============  =====
 
 

@@ -4,14 +4,15 @@
     "greenMin": 99,
     "redMax": 317,
     "blueMin": 186,
-    "yellowProto": 35,
-    "greenProto": 120,
+    "yellowProto": 65,
+    "greenProto": 130,
     "redMin": 13,
     "blueMax": 265,
     "greenMax": 178,
-    "redProto": 0,
-    "blueProto": 240,
-    "yellowMax": 76
+    "redProto": 13,
+    "blueProto": 214,
+    "yellowMax": 76,
+    "enableProto": 1
   },
   "seuil": {
     "saturation": 0.2300001084804535,
@@ -41,7 +42,8 @@
     "zoom": 0.4101971685886383,
     "id": 0,
     "enabled": 0,
-    "height": 2160
+    "height": 2160,
+    "focus_absolute": 0
   },
   "flash": {
     "grayLevelDown": 204,
